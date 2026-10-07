@@ -36,7 +36,7 @@ public class ProgressStream : Stream
     /// </summary>
     public event ProgressStreamReportEventHandler BytesMoved;
 
-    protected virtual void OnBytesRead(int bytesMoved)
+    protected virtual void NyOnBytesRead(int bytesMoved)
     {
         if (BytesRead != null)
         {
@@ -45,10 +45,10 @@ public class ProgressStream : Stream
         }
     }
 
-    protected virtual void OnBytesWritten(int bytesMoved) => BytesWritten?.Invoke(this, new ProgressStreamReportEventArgs(bytesMoved, innerStream.Length, innerStream.Position, false));
+    protected virtual void NyOnBytesWritten(int bytesMoved) => BytesWritten?.Invoke(this, new ProgressStreamReportEventArgs(bytesMoved, innerStream.Length, innerStream.Position, false));
 
 
-    protected virtual void OnBytesMoved(int bytesMoved, bool isRead) => BytesMoved?.Invoke(this, new ProgressStreamReportEventArgs(bytesMoved, innerStream.Length, innerStream.Position, isRead));
+    protected virtual void NyOnBytesMoved(int bytesMoved, bool isRead) => BytesMoved?.Invoke(this, new ProgressStreamReportEventArgs(bytesMoved, innerStream.Length, innerStream.Position, isRead));
 
     #endregion
 
@@ -77,8 +77,8 @@ public class ProgressStream : Stream
     {
         var bytesRead = innerStream.Read(buffer, offset, count);
 
-        OnBytesRead(bytesRead);
-        OnBytesMoved(bytesRead, true);
+        NyOnBytesRead(bytesRead);
+        NyOnBytesMoved(bytesRead, true);
 
         return bytesRead;
     }
@@ -97,8 +97,8 @@ public class ProgressStream : Stream
     {
         innerStream.Write(buffer, offset, count);
 
-        OnBytesWritten(count);
-        OnBytesMoved(count, false);
+        NyOnBytesWritten(count);
+        NyOnBytesMoved(count, false);
     }
 
     public override void Close()

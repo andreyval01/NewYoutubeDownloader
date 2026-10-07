@@ -6,17 +6,17 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              FlowDirection="{DynamicResource FlowDirection}"
-             HorizontalAlignment="Center">
+             HorizontalAlignment="Stretch">
 
-    <Grid Margin="50,0">
+    <Grid Margin="8,0">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <Label Content="{DynamicResource General}" Foreground="{DynamicResource MahApps.Brushes.Accent}" FontSize="26" />
                 <StackPanel Margin="10,0,0,0" >
                     <StackPanel Orientation="Horizontal">
                         <Label Content="{DynamicResource SaveDirectory}" Margin="5"  />
-                        <TextBox x:Name="SaveDirectoryTextBox" Margin="5" TextChanged="SaveDirectoryTextBox_TextChanged" MouseDoubleClick="TextBox_MouseDoubleClick" HorizontalAlignment="Left" MinWidth="120" />
-                        <Controls:Tile Grid.Row="4" Grid.Column="2" Width="30" Height="30" Click="Tile_Click" HorizontalAlignment="Left" >
+                        <TextBox x:Name="SaveDirectoryTextBox" Margin="5" TextChanged="NySaveDirectoryTextBox_TextChanged" MouseDoubleClick="NyTextBox_MouseDoubleClick" HorizontalAlignment="Left" MinWidth="120" />
+                        <Controls:Tile Grid.Row="4" Grid.Column="2" Width="30" Height="30" Click="NyTile_Click" HorizontalAlignment="Left" >
                             <iconPacks:PackIconModern Width="20" Height="20" Kind="FolderOpen" Margin="5" />
                         </Controls:Tile>
                     </StackPanel>
@@ -24,12 +24,16 @@
                     <CheckBox x:Name="OpenDestinationFolderCheckBox" Content="{DynamicResource OpenDestinationFolderOnFinish}" Margin="5" />
                     <StackPanel Orientation="Horizontal">
                         <Label Content="{DynamicResource FileNamePattern}" Margin="5"  />
-                        <TextBox x:Name="FileNamePattenTextBox" TextChanged="FileNamePattenTextBox_TextChanged" Margin="5" HorizontalAlignment="Left" MinWidth="120" />
-                        <Controls:Tile Grid.Row="4" Grid.Column="2" Height="30" MinWidth="100" Width="Auto" HorizontalAlignment="Center" Click="RestPatternToDefault_Click">
+                        <TextBox x:Name="FileNamePattenTextBox" TextChanged="NyFileNamePattenTextBox_TextChanged" Margin="5" HorizontalAlignment="Left" MinWidth="120" />
+                        <Controls:Tile Grid.Row="4" Grid.Column="2" Height="30" MinWidth="100" Width="Auto" HorizontalAlignment="Center" Click="NyRestPatternToDefault_Click">
                             <Label Content="{DynamicResource ResetToDefault}" />
                         </Controls:Tile>
                     </StackPanel>
                     <CheckBox x:Name="SkipExistingCheckbox" Content="{DynamicResource SkipExisting}" Margin="5" />
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{DynamicResource SimultaneousDownloads}" Margin="5" />
+                        <TextBox x:Name="SimultaneousDownloadsTextBox" Margin="5" MinWidth="40" Width="40" TextAlignment="Center" />
+                    </StackPanel>
                 </StackPanel>
                 <Label Content="{DynamicResource Video}" Foreground="{DynamicResource MahApps.Brushes.Accent}" FontSize="26"/>
                 <WrapPanel Orientation="Vertical" Margin="10,0,0,0">

@@ -1,1 +1,1 @@
-https://github.com/shaked6540/YoutubePlaylistDownloader/releases/download/1.9.34/YoutubePlaylistDownloader.exe
+https://github.com/andreyval01/NewYoutubeDownloader

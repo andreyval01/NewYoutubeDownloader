@@ -1,2 +1,53 @@
-﻿1.9.34:
+﻿0.1:
+- First public release: YouTube, Rutube and VK Video downloads, queue, and transcoding of files already downloaded
+
+1.9.47:
+- Separate Transcode section for files already downloaded, with presets and a size estimate before encoding
+
+1.9.46:
+- Resume checks files already on disk and counts the whole playlist, including unfinished parts that the queue had skipped
+
+1.9.45:
+- Interface language follows the Windows language, with English used when a translation is missing
+- Saved downloads appear in the queue immediately and then continue
+
+1.9.44:
+- Queue jobs and files can be multi-selected, with context menus, keyboard shortcuts, filter and a status line
+
+1.9.43:
+- Application name is NewYoutubeDownloader
+- Settings and the download queue move to the new application folder
+- Method names that matched the original fork were renamed
+
+1.9.42:
+- Queue works like a torrent client: order, pause, priority, and a file list for the selected download
+
+1.9.41:
+- Modern adaptive interface and in-app help
+- Removed previous author and repository credits
+
+1.9.40:
+- Setting for simultaneous downloads (default 2)
+- Unfinished downloads resume after restart; queue and settings are saved when a job is added and progress is updated while downloading
+
+1.9.39:
+- Rutube playlist downloads use the playlist title as the folder name
+
+1.9.38:
+- Channel playlist pages like rutube.ru/channel/.../playlists/ list playlists instead of failing
+- Playlist files are numbered in order (01 - title) and an .m3u is written for sequential playback
+
+1.9.37:
+- Back no longer cancels downloads; jobs stay in the queue
+- Playlist downloads create a subfolder named after the playlist
+- Scan a page for other playlists and add them to bulk download
+
+1.9.36:
+- Fixed a crash when pasting a Rutube playlist
+- Added Rutube account sign-in; downloads use the saved session
+
+1.9.35:
+- Added downloading videos and playlists from Rutube and VK Video
+
+1.9.34:
 - Fixed "Video not available" issues

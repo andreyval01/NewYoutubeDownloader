@@ -3,12 +3,13 @@
                     xmlns:s="clr-namespace:System;assembly=mscorlib"
                     xml:space="preserve">
     
-    <s:String x:Key="Title">YouTube Playlist Downloader</s:String>
+    <s:String x:Key="Title">NewYoutubeDownloader</s:String>
     <FlowDirection x:Key="FlowDirection">LeftToRight</FlowDirection>
-    <s:String x:Key="InsertYoutubePlaylistLinkHere">Вставьте сюда YouTube ссылку</s:String>
+    <s:String x:Key="InsertYoutubePlaylistLinkHere">Вставьте сюда ссылку YouTube, Rutube или VK Видео</s:String>
     <s:String x:Key="Exit">Выйти</s:String>
     <s:String x:Key="ExitMessage">Вы действительно хотите выйти?</s:String>
     <s:String x:Key="Yes">Да</s:String>
+    <s:String x:Key="Ok">ОК</s:String>
     <s:String x:Key="No">Нет</s:String>
     <s:String x:Key="Error">Ошибка</s:String>
     <s:String x:Key="ErrorMessage">При выполнении этого действия возникла непредвиденная ошибка. Пожалуйста, свяжитесь со своим администратором для её решения.</s:String>
@@ -42,23 +43,16 @@
     <s:String x:Key="Prefer">Предпочтительное разрешение видео</s:String>
     <s:String x:Key="AreYouSureExit">Вы действительно хотите выйти?</s:String>
     <s:String x:Key="TotalVideos">Всего видео: </s:String>
-    <s:String x:Key="AboutTheProgram">Эта программа была разработана shaked6540, и она полностью бесплатна для использования без лимитов.
-Однако я не несу ответственность за какие-либо легальные проблемы, которые данная программа может у вас вызвать,
-ведь, насколько я знаю, YouTube не разрешает загружать видео с их сайта.
-Полный исходный код этой программы может быть найден на https://github.com/shaked6540/YoutubePlaylistDownloader
-        
-Установщик этой программы был создан с помощью Inno Setup (http://www.jrsoftware.org/isinfo.php)
-    
+    <s:String x:Key="AboutTheProgram">Программа для скачивания видео и плейлистов с YouTube, Rutube и VK Видео.
 
-YouTube Playlist Downloader v</s:String>
+NewYoutubeDownloader v</s:String>
     <s:String x:Key="BitRate">и установить битрейт</s:String>
     <s:String x:Key="NewVersionAvailable">Новая версия доступна</s:String>
     <s:String x:Key="DoYouWantToUpdate">Новая версия доступна, хотите ли вы обновить программу?
 Вот что нового:</s:String>
     <s:String x:Key="DownloadingUpdateSetup">Загружается: Установщик Обновления</s:String>
     <s:String x:Key="UpdateCancelled">Обновление было отменено.</s:String>
-    <s:String x:Key="ErrorWhileUpdating">Возникла ошибка при загрузке установщика обновления. Убедитесь, что вы подключены к Интернету.
-Если вы подключены к Интернету, попробуйте повторить попытку позже или посетите https://github.com/shaked6540/YoutubePlaylistDownloader/issues , чтобы проверить, есть ли проблемы с сервером загрузки.</s:String>
+    <s:String x:Key="ErrorWhileUpdating">Возникла ошибка при загрузке обновления. Убедитесь, что вы подключены к Интернету, и повторите попытку позже.</s:String>
     <s:String x:Key="UpdateComplete">Загрузка завершена.</s:String>
     <s:String x:Key="UpdateWhenIExit">Обновить при выходе</s:String>
     <s:String x:Key="UpdateAndExit">Закрыть и обновить сейчас</s:String>
@@ -100,11 +94,7 @@ YouTube Playlist Downloader v</s:String>
 Пожалуйста, обратите внимание, что если программа закрыта, новые видео не будут загружены.
     </s:String>
     <s:String x:Key="ContactTheDeveloper">Связь</s:String>
-    <s:String x:Key="ContactTheDeveloperHelp">Есть несколько способов связаться со мной (shaked6540): 
-        
-Первый способ – Reddit. Просто отправьте мне сообщение на Reddit, и я отвечу на него, как только смогу. Вот ссылка на мой профиль: https://www.reddit.com/user/shaked6540/
-        
-Третий способ связаться со мной – через GitHub, просто создайте новую "проблему", и я постараюсь ответить, как только смогу, вот ссылка: https://github.com/shaked6540/YoutubePlaylistDownloader/issues</s:String>
+    <s:String x:Key="ContactTheDeveloperHelp">Краткая справка по загрузкам, плейлистам и настройкам открывается кнопкой «Помощь» в верхней части окна.</s:String>
     <s:String x:Key="AutomaticallyCheckForUpdates">Автоматически проверять наличие обновлений при запуске программы</s:String>
     <s:String x:Key="WhatsNew">Что нового?</s:String>
     <s:String x:Key="SubscriptionsUpdateDelay">Обновлять подписки каждые</s:String>
@@ -179,5 +169,131 @@ $playlist: Название плейлиста
 Пожалуйста, обратите внимание, что не все параметры всегда будут доступны (например, когда вы загружаете только одно видео, переменная $playlisttitle будет недоступна), и в этом случае, они будут удалены из названия файла</s:String>
     <s:String x:Key="CopyToClipboard">Скопировать в буфер обмена</s:String>
     <s:String x:Key="SaveToTextFile">Сохранить в текстовый файл</s:String>
-    <s:String x:Key="VideoLanguage">Video Language: </s:String>
+    <s:String x:Key="VideoLanguage">Язык видео: </s:String>
+    <s:String x:Key="YouTubeAccount">Аккаунт YouTube</s:String>
+    <s:String x:Key="SignInToYouTube">Войти</s:String>
+    <s:String x:Key="SignOutYouTube">Выйти</s:String>
+    <s:String x:Key="YouTubeSignedIn">Вход выполнен — полное качество через эту сессию</s:String>
+    <s:String x:Key="YouTubeSignedOut">Вход не выполнен</s:String>
+    <s:String x:Key="ImportFirefoxSession">Импорт сессии Firefox</s:String>
+    <s:String x:Key="FirefoxCookiesNotFound">Не удалось импортировать вход YouTube из Firefox.</s:String>
+    <s:String x:Key="SaveYouTubeSession">Сохранить сессию</s:String>
+    <s:String x:Key="YouTubeLoginHint">Войдите в YouTube, затем сохраните сессию. Adaptive 1080p идёт через этот вход.</s:String>
+    <s:String x:Key="CapturingSession">Сохранение cookies…</s:String>
+    <s:String x:Key="YouTubeLoginNotDetected">Вход не обнаружен. Откройте главную YouTube после логина и сохраните сессию.</s:String>
+    <s:String x:Key="Cancel">Отмена</s:String>
+    <s:String x:Key="RutubeAccount">Аккаунт Rutube</s:String>
+    <s:String x:Key="SignInToRutube">Войти</s:String>
+    <s:String x:Key="SignOutRutube">Выйти</s:String>
+    <s:String x:Key="RutubeSignedIn">Вход выполнен — скачивание с Rutube идёт через эту сессию</s:String>
+    <s:String x:Key="RutubeSignedOut">Вход не выполнен</s:String>
+    <s:String x:Key="SaveRutubeSession">Сохранить сессию</s:String>
+    <s:String x:Key="RutubeLoginHint">Войдите в Rutube, затем сохраните сессию. Закрытые и ограниченные видео идут через этот вход.</s:String>
+    <s:String x:Key="RutubeLoginNotDetected">Вход не обнаружен. Откройте главную Rutube после логина и сохраните сессию.</s:String>
+    <s:String x:Key="FirefoxRutubeCookiesNotFound">Не удалось импортировать вход Rutube из Firefox.</s:String>
+    <s:String x:Key="FindRelatedPlaylists">Найти другие плейлисты</s:String>
+    <s:String x:Key="AddRelatedPlaylistsToBulk">Добавить в пакетную загрузку</s:String>
+    <s:String x:Key="RelatedPlaylistsFound">Найдено плейлистов: {0}</s:String>
+    <s:String x:Key="RelatedPlaylistsNone">На странице нет других плейлистов</s:String>
+    <s:String x:Key="RelatedPlaylistsAdded">Добавлено плейлистов в пакетную загрузку: {0}</s:String>
+    <s:String x:Key="ChannelPlaylists">Плейлисты канала</s:String>
+    <s:String x:Key="SimultaneousDownloads">Одновременных скачиваний:</s:String>
+    <s:String x:Key="WaitingInQueue">Ожидание в очереди...</s:String>
+    <s:String x:Key="HelpIntroTitle">Начало работы</s:String>
+    <s:String x:Key="HelpIntro">Вставьте ссылку на видео, плейлист или канал YouTube, Rutube или VK Видео. Публичные материалы скачиваются без входа. Для закрытых и ограниченных видео войдите в аккаунт в Настройках.</s:String>
+    <s:String x:Key="HelpDownloadTitle">Скачивание</s:String>
+    <s:String x:Key="HelpDownload">«Скачать» показывает прогресс на экране, «Добавить в очередь» запускает задание в фоне. Кнопка «Назад» не отменяет загрузку — задание остаётся в очереди. Папку, формат, качество и шаблон имени файла задайте в Опциях.</s:String>
+    <s:String x:Key="HelpSourcesTitle">Источники</s:String>
+    <s:String x:Key="HelpSources">Поддерживаются YouTube, Rutube и VK Видео. Полное качество YouTube и закрытые ролики Rutube используют сессию из Настроек (вход в приложении или импорт cookies Firefox).</s:String>
+    <s:String x:Key="HelpPlaylistsTitle">Плейлисты</s:String>
+    <s:String x:Key="HelpPlaylists">Плейлист можно сохранить в отдельную папку с его названием. Файлы нумеруются по порядку, для последовательного воспроизведения создаётся файл .m3u. На странице можно найти другие плейлисты и добавить их в массовую загрузку. Каталог плейлистов канала раскрывается в список.</s:String>
+    <s:String x:Key="HelpQueueTitle">Очередь и продолжение</s:String>
+    <s:String x:Key="HelpQueue">Вкладка «Очередь» показывает загрузки как в торрент-клиенте. Несколько строк выбираются с Ctrl и Shift. Выделенные задания можно поставить на паузу, продолжить, передвинуть или отменить. Список файлов относится к заданию в фокусе. Правый клик открывает меню. При продолжении программа проверяет файлы в папке: готовый ролик с подходящей длительностью остаётся, недописанный .part скачивается снова. Счётчик — это число проверенных файлов из всего плейлиста.</s:String>
+    <s:String x:Key="Pause">Пауза</s:String>
+    <s:String x:Key="Resume">Продолжить</s:String>
+    <s:String x:Key="MoveUp">Выше</s:String>
+    <s:String x:Key="MoveDown">Ниже</s:String>
+    <s:String x:Key="MoveToTop">В начало</s:String>
+    <s:String x:Key="Paused">На паузе</s:String>
+    <s:String x:Key="QueueDetails">Сведения</s:String>
+    <s:String x:Key="QueueFiles">Файлы</s:String>
+    <s:String x:Key="QueueName">Название</s:String>
+    <s:String x:Key="QueueState">Статус</s:String>
+    <s:String x:Key="FileQueued">В очереди</s:String>
+    <s:String x:Key="FileDownloading">Скачивается</s:String>
+    <s:String x:Key="FilePaused">На паузе</s:String>
+    <s:String x:Key="FileDone">Готово</s:String>
+    <s:String x:Key="FileError">Ошибка</s:String>
+    <s:String x:Key="FilePartial">Не докачан</s:String>
+    <s:String x:Key="CheckingFiles">Проверка файлов...</s:String>
+    <s:String x:Key="PauseFile">Пауза файла</s:String>
+    <s:String x:Key="ResumeFile">Продолжить файл</s:String>
+    <s:String x:Key="Prioritize">Приоритет</s:String>
+    <s:String x:Key="DestinationFolder">Папка</s:String>
+    <s:String x:Key="CurrentFile">Текущий файл</s:String>
+    <s:String x:Key="FileName">Файл</s:String>
+    <s:String x:Key="Source">Ссылка</s:String>
+    <s:String x:Key="MoveToBottom">В конец</s:String>
+    <s:String x:Key="OpenFolder">Открыть папку</s:String>
+    <s:String x:Key="OpenFile">Открыть файл</s:String>
+    <s:String x:Key="CopyLink">Копировать ссылку</s:String>
+    <s:String x:Key="CopyPath">Копировать путь</s:String>
+    <s:String x:Key="CopyFileName">Копировать имя файла</s:String>
+    <s:String x:Key="SelectAll">Выделить все</s:String>
+    <s:String x:Key="ClearSelection">Снять выделение</s:String>
+    <s:String x:Key="SelectErrors">Выделить с ошибкой</s:String>
+    <s:String x:Key="SelectPaused">Выделить на паузе</s:String>
+    <s:String x:Key="RetryFile">Повторить</s:String>
+    <s:String x:Key="DownloadNext">Скачать следующим</s:String>
+    <s:String x:Key="QueueFilter">Фильтр по названию, папке или ссылке</s:String>
+    <s:String x:Key="QueueSummary">Выбрано: {0}, на паузе: {1}, скачивается: {2}</s:String>
+    <s:String x:Key="QueueNoFiles">Выберите загрузку, чтобы увидеть её файлы</s:String>
+    <s:String x:Key="CancelSelectedConfirm">Отменить загрузок: {0}?</s:String>
+    <s:String x:Key="QueueStatusLine">Загрузок: {0} · выбрано: {1} · {2} МиБ/с</s:String>
+    <s:String x:Key="QueueRetryUnavailable">Эта загрузка уже завершена, повторить файл из очереди нельзя.</s:String>
+    <s:String x:Key="HelpSettingsTitle">Настройки</s:String>
+    <s:String x:Key="HelpSettings">Тема, язык, аккаунты YouTube и Rutube, лимит одновременных конвертаций. Параметры загрузки (папка, формат, качество) открываются кнопкой «Опции» на главном экране.</s:String>
+    <s:String x:Key="Transcode">Перекодирование</s:String>
+    <s:String x:Key="TranscodeAddFiles">Добавить файлы</s:String>
+    <s:String x:Key="TranscodeAddFolder">Добавить папку</s:String>
+    <s:String x:Key="TranscodeClear">Очистить</s:String>
+    <s:String x:Key="TranscodeSubfolders">Включая подпапки</s:String>
+    <s:String x:Key="TranscodeAgain">Перекодировать снова</s:String>
+    <s:String x:Key="TranscodeAsIs">Как есть</s:String>
+    <s:String x:Key="TranscodeCompatible">Совместимый</s:String>
+    <s:String x:Key="TranscodeSmaller">Меньше</s:String>
+    <s:String x:Key="TranscodeStrong">Сильное</s:String>
+    <s:String x:Key="TranscodeStrongNote">Старые проигрыватели могут не открыть HEVC</s:String>
+    <s:String x:Key="TranscodeOpus">Только звук, Opus 64 кбит/с</s:String>
+    <s:String x:Key="TranscodeMp3">Только звук, MP3 128 кбит/с</s:String>
+    <s:String x:Key="TranscodeCustom">Свой</s:String>
+    <s:String x:Key="TranscodeDuration">Длительность</s:String>
+    <s:String x:Key="TranscodeResolution">Разрешение</s:String>
+    <s:String x:Key="TranscodeVideoCodec">Видео</s:String>
+    <s:String x:Key="TranscodeAudioCodec">Звук</s:String>
+    <s:String x:Key="TranscodeSize">Размер</s:String>
+    <s:String x:Key="TranscodeEstimated">Оценка</s:String>
+    <s:String x:Key="TranscodePercent">Экономия</s:String>
+    <s:String x:Key="TranscodeDelta">Разница</s:String>
+    <s:String x:Key="TranscodeStart">Перекодировать</s:String>
+    <s:String x:Key="TranscodeCancel">Отмена</s:String>
+    <s:String x:Key="TranscodeEstimateHint">Это оценка по длительности, разрешению и качеству, а не точный размер после кодирования.</s:String>
+    <s:String x:Key="TranscodePickFiles">Добавьте уже скачанные файлы или папку, чтобы увидеть оценку размера.</s:String>
+    <s:String x:Key="TranscodeReading">Чтение</s:String>
+    <s:String x:Key="TranscodeUnavailable">Оценка недоступна</s:String>
+    <s:String x:Key="TranscodeNoVideo">В файле нет видео</s:String>
+    <s:String x:Key="TranscodeSummary">Файлов: {0}, сейчас {1}, оценка {2}, экономия {3}</s:String>
+    <s:String x:Key="TranscodeBusyDownload">Ещё скачивается</s:String>
+    <s:String x:Key="TranscodeSkipped">Уже перекодирован этим вариантом</s:String>
+    <s:String x:Key="TranscodeWorking">Перекодирование</s:String>
+    <s:String x:Key="TranscodeDone">Готово</s:String>
+    <s:String x:Key="TranscodeContainer">Контейнер</s:String>
+    <s:String x:Key="TranscodeCodec">Кодек</s:String>
+    <s:String x:Key="TranscodeHeight">Высота</s:String>
+    <s:String x:Key="TranscodeQuality">Качество (CRF)</s:String>
+    <s:String x:Key="TranscodeAudio">Звук</s:String>
+    <s:String x:Key="TranscodeBitrate">Битрейт</s:String>
+    <s:String x:Key="TranscodeOriginal">Как есть</s:String>
+    <s:String x:Key="HelpTranscodeTitle">Перекодирование</s:String>
+    <s:String x:Key="HelpTranscode">Раздел «Перекодирование» сжимает уже скачанные файлы и заменяет исходный файл после успешного кодирования. Выберите вариант, чтобы увидеть оценку размера и экономии. Процент — это оценка, а не точный размер после кодирования.</s:String>
 </ResourceDictionary>

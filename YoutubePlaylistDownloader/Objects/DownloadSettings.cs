@@ -40,7 +40,8 @@ public class DownloadSettings
     [JsonProperty]
     public string CaptionsLanguage { get; set; }
 
-    [JsonProperty]
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+    [DefaultValue(true)]
     public bool SavePlaylistsInDifferentDirectories { get; set; }
 
     [JsonProperty]
@@ -83,13 +84,19 @@ public class DownloadSettings
     [DefaultValue("default")]
     public string VideoLanguage { get; set; }
 
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+    [DefaultValue(2)]
+    public int MaxSimultaneousDownloads { get; set; } = 2;
+
+    public static int NormalizeSimultaneousDownloads(int value)
+        => value < 1 ? 2 : Math.Clamp(value, 1, 16);
 
     [JsonConstructor]
     public DownloadSettings(string saveFormat, bool audioOnly, VideoQuality quality, bool preferHighestFPS,
     bool preferQuality, bool convert, bool setBitrate, string bitrate, bool downloadCaptions, string captionsLanguage,
     bool savePlaylistsInDifferentDirectories, bool subset, int subsetStartIndex, int subsetEndIndex, bool openDestinationFolderWhenDone,
     bool tagAudioFile, bool filterVideosByLength, bool filterMode, double filterByLengthValue, string filenamePattern, bool skipExisting,
-    string videoSaveFormat, string videoLanguage)
+    string videoSaveFormat, string videoLanguage, int maxSimultaneousDownloads = 2)
     {
         SaveFormat = saveFormat;
         AudioOnly = audioOnly;
@@ -114,6 +121,7 @@ public class DownloadSettings
         SkipExisting = skipExisting;
         VideoSaveFormat = videoSaveFormat;
         VideoLanguage = videoLanguage;
+        MaxSimultaneousDownloads = NormalizeSimultaneousDownloads(maxSimultaneousDownloads);
     }
 
     public DownloadSettings(DownloadSettings settings)
@@ -141,9 +149,10 @@ public class DownloadSettings
         SkipExisting = settings.SkipExisting;
         VideoSaveFormat = settings.VideoSaveFormat;
         VideoLanguage = settings.VideoLanguage;
+        MaxSimultaneousDownloads = NormalizeSimultaneousDownloads(settings.MaxSimultaneousDownloads);
     }
 
-    public string GetFilenameByPattern(IVideo video, int index, string file, FullPlaylist playlist = null)
+    public string NyGetFilenameByPattern(IVideo video, int index, string file, FullPlaylist playlist = null, int totalCount = 0)
     {
         if (video == null)
         {
@@ -182,14 +191,21 @@ public class DownloadSettings
             genre = string.Empty;
         }
 
-        if (GlobalConsts.TryGetSongTitleAndPerformersFromTitle(title, out songTitle, out string[] songPerformers))
+        if (GlobalConsts.NyTryGetSongTitleAndPerformersFromTitle(title, out songTitle, out string[] songPerformers))
         {
             artist = string.Join(", ", songPerformers);
         }
 
-        var result = FilenamePattern
+        var number = index + 1;
+        var width = Math.Max(2, Math.Max(number, totalCount).ToString().Length);
+        var indexText = number.ToString().PadLeft(width, '0');
+        var pattern = string.IsNullOrWhiteSpace(FilenamePattern) ? "$title" : FilenamePattern;
+        if (totalCount > 1 && pattern.IndexOf("$index", StringComparison.OrdinalIgnoreCase) < 0)
+            pattern = "$index - " + pattern;
+
+        var result = pattern
             .Replace("$title", title)
-            .Replace("$index", (index + 1).ToString())
+            .Replace("$index", indexText)
             .Replace("$artist", artist)
             .Replace("$songtitle", songTitle)
             .Replace("$channel", video.Author.ChannelTitle)
@@ -200,5 +216,5 @@ public class DownloadSettings
         return string.IsNullOrWhiteSpace(result) ? title : result;
     }
 
-    public DownloadSettings Clone() => new(this);
+    public DownloadSettings NyClone() => new(this);
 }

@@ -1,4 +1,7 @@
-﻿namespace YoutubePlaylistDownloader;
+﻿using System.Globalization;
+using System.Windows.Markup;
+
+namespace YoutubePlaylistDownloader;
 
 /// <summary>
 /// Interaction logic for App.xaml
@@ -8,38 +11,43 @@ public partial class App : Application
 
     public App()
     {
-        DispatcherUnhandledException += App_DispatcherUnhandledException;
+        DispatcherUnhandledException += NyApp_DispatcherUnhandledException;
     }
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        var culture = CultureInfo.CurrentUICulture;
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        Thread.CurrentThread.CurrentCulture = culture;
+        Thread.CurrentThread.CurrentUICulture = culture;
+        FrameworkElement.LanguageProperty.OverrideMetadata(
+            typeof(FrameworkElement),
+            new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(culture.IetfLanguageTag)));
+
         base.OnStartup(e);
-        GlobalConsts.LoadConsts();
-        GlobalConsts.CreateTempFolder();
+        GlobalConsts.NyLoadConsts();
+        GlobalConsts.NyCreateTempFolder();
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
-        GlobalConsts.SaveConsts();
+        GlobalConsts.NySaveConsts();
         if (GlobalConsts.UpdateOnExit && !string.IsNullOrWhiteSpace(GlobalConsts.UpdateSetupLocation) && GlobalConsts.UpdateFinishedDownloading)
         {
             Process.Start(GlobalConsts.UpdateSetupLocation);
         }
         else
         {
-            GlobalConsts.CleanTempFolder();
+            GlobalConsts.NyCleanTempFolder();
         }
         base.OnExit(e);
     }
 
-    async void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    async void NyApp_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        await GlobalConsts.ShowMessage((string)FindResource("Error"), (string)FindResource("ErrorMessage"));
-        await GlobalConsts.Log($"{e.Exception}", "Unhandled exception");
-
-        // Don't crash at the moment of truth >.<
-#if !DEBUG
-            e.Handled = true;
-#endif
+        await GlobalConsts.NyShowMessage((string)FindResource("Error"), (string)FindResource("ErrorMessage"));
+        await GlobalConsts.NyLog($"{e.Exception}", "Unhandled exception");
+        e.Handled = true;
     }
 }

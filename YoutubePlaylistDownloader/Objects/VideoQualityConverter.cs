@@ -26,7 +26,7 @@ public class VideoQualityConverter : JsonConverter
         }
         if (label != "")
         {
-            return YoutubeHelpers.FromLabel(label, 30);
+            return YoutubeHelpers.NyFromLabel(label, 30);
         }
         return YoutubeHelpers.High720;
     }

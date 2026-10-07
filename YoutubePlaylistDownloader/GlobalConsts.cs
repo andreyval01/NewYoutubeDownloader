@@ -12,7 +12,7 @@ static class GlobalConsts
     public static readonly string FFmpegFilePath;
     private static readonly string ConfigFilePath;
     private static readonly string ErrorFilePath;
-    public static readonly Version VERSION = new(1, 9, 34);
+    public static readonly Version VERSION = new(0, 1);
     public static bool UpdateOnExit;
     public static string UpdateSetupLocation;
     public static bool UpdateFinishedDownloading;
@@ -33,7 +33,7 @@ static class GlobalConsts
     {
         get
         {
-            downloadSettings ??= new DownloadSettings("mp3", false, YoutubeHelpers.High720, false, false, false, false, "192", false, "en", false, false, 0, 0, false, true, false, true, 4, "$title", false, "mkv", "default");
+            downloadSettings ??= new DownloadSettings("mp3", false, YoutubeHelpers.High720, false, false, false, false, "192", false, "en", true, false, 0, 0, false, true, false, true, 4, "$title", false, "mkv", "default");
             return downloadSettings;
         }
         set
@@ -41,9 +41,8 @@ static class GlobalConsts
             if (value != null)
             {
                 downloadSettings = value;
-
-                if (settings.SaveDownloadOptions)
-                    File.WriteAllText(DownloadSettingsFilePath, JsonConvert.SerializeObject(downloadSettings));
+                DownloadGate.Limit = DownloadSettings.NormalizeSimultaneousDownloads(downloadSettings.MaxSimultaneousDownloads);
+                File.WriteAllText(DownloadSettingsFilePath, JsonConvert.SerializeObject(downloadSettings));
             }
         }
     }
@@ -59,9 +58,21 @@ static class GlobalConsts
             return settings;
         };
         Downloads = [];
+        DownloadGate.PriorityOf = id =>
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return int.MaxValue;
+            for (var i = 0; i < Downloads.Count; i++)
+            {
+                if (string.Equals(Downloads[i].JobId, id, StringComparison.OrdinalIgnoreCase))
+                    return i;
+            }
+
+            return int.MaxValue;
+        };
         CurrentDir = new FileInfo(Assembly.GetEntryAssembly().Location).Directory.ToString();
         FFmpegFilePath = $"{CurrentDir}\\ffmpeg.exe";
-        var appDataPath = string.Concat(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "\\Youtube Playlist Downloader\\");
+        var appDataPath = AppPaths.AppDataDirectory + "\\";
         ConfigFilePath = string.Concat(appDataPath, "Settings.json");
         ErrorFilePath = string.Concat(appDataPath, "Errors.txt");
         DownloadSettingsFilePath = string.Concat(appDataPath, "DownloadSettings.json");
@@ -75,98 +86,100 @@ static class GlobalConsts
         {
             Language = "English"
         };
-        TempFolderPath = string.Concat(Path.GetTempPath(), "YoutubePlaylistDownloader\\");
+        TempFolderPath = AppPaths.TempDirectory + "\\";
         UpdateOnExit = false;
         UpdateLater = false;
         UpdateSetupLocation = string.Empty;
         SubscriptionsUpdateDelay = TimeSpan.FromMinutes(1);
-        Downloads.CollectionChanged += Downloads_CollectionChanged;
+        Downloads.CollectionChanged += NyDownloads_CollectionChanged;
     }
 
     //The const methods are used mainly for saving/loading consts, and handling page\menu management.
     #region Const Methods
 
     #region Buttons
-    public static void HideHelpButton()
+    public static void NyHideHelpButton()
     {
         Current.HelpButton.Visibility = Visibility.Collapsed;
     }
-    public static void HideHomeButton()
+    public static void NyHideHomeButton()
     {
         Current.HomeButton.Visibility = Visibility.Collapsed;
     }
-    public static void HideAboutButton()
+    public static void NyHideAboutButton()
     {
-        Current.AboutButton.Visibility = Visibility.Collapsed;
     }
-    public static void HideSettingsButton()
+    public static void NyHideSettingsButton()
     {
         Current.SettingsButton.Visibility = Visibility.Collapsed;
     }
-    public static void ShowSettingsButton()
+    public static void NyShowSettingsButton()
     {
         Current.SettingsButton.Visibility = Visibility.Visible;
     }
-    public static void ShowHelpButton()
+    public static void NyShowHelpButton()
     {
         Current.HelpButton.Visibility = Visibility.Visible;
     }
-    public static void ShowAboutButton()
+    public static void NyShowAboutButton()
     {
-        Current.AboutButton.Visibility = Visibility.Visible;
     }
-    public static void ShowHomeButton()
+    public static void NyShowHomeButton()
     {
         Current.HomeButton.Visibility = Visibility.Visible;
     }
     #endregion
 
-    public static async Task ShowMessage(string title, string message)
+    public static Task NyShowMessage(string title, string message)
+    {
+        if (!Current.Dispatcher.CheckAccess())
+            return Current.Dispatcher.InvokeAsync(() => NyShowMessage(title, message)).Task.Unwrap();
+
+        if (Current.DefaultFlyout.IsOpen)
+            Current.DefaultFlyout.IsOpen = false;
+        return Current.NyShowMessage(title, message);
+    }
+    public static async Task<MessageDialogResult> NyShowYesNoDialog(string title, string message)
     {
         if (Current.DefaultFlyout.IsOpen)
             Current.DefaultFlyout.IsOpen = false;
-        await Current.ShowMessage(title, message).ConfigureAwait(false);
+        return await Current.NyShowYesNoDialog(title, message).ConfigureAwait(false);
     }
-    public static async Task<MessageDialogResult> ShowYesNoDialog(string title, string message)
+    public static Task NyShowSelectableDialog(string title, string message, Action retryAction)
     {
         if (Current.DefaultFlyout.IsOpen)
             Current.DefaultFlyout.IsOpen = false;
-        return await Current.ShowYesNoDialog(title, message).ConfigureAwait(false);
+        return Current.NyShowSelectableDialog(title, message, retryAction);
     }
-    public static Task ShowSelectableDialog(string title, string message, Action retryAction)
-    {
-        if (Current.DefaultFlyout.IsOpen)
-            Current.DefaultFlyout.IsOpen = false;
-        return Current.ShowSelectableDialog(title, message, retryAction);
-    }
-    public static void LoadPage(UserControl page) => Current.CurrentPage.Content = page;
-    public static void SaveConsts()
+    public static void NyLoadPage(UserControl page) => Current.CurrentPage.Content = page;
+    public static void NySaveConsts()
     {
         try
         {
             File.WriteAllText(ConfigFilePath, JsonConvert.SerializeObject(settings));
-            SaveDownloadSettings();
+            NySaveDownloadSettings();
+            DownloadQueueStore.NyFlush();
         }
         catch (Exception ex)
         {
-            Log(ex.ToString(), "SaveConsts").Wait();
+            NyLog(ex.ToString(), "SaveConsts").Wait();
         }
     }
-    public static void RestoreDefualts()
+    public static void NyRestoreDefualts()
     {
-        Log("Restoring defaults", "RestoreDefaults at GlobalConsts").Wait();
+        NyLog("Restoring defaults", "RestoreDefaults at GlobalConsts").Wait();
         settings = new Objects.Settings("Dark", "Red", "English", Environment.GetFolderPath(Environment.SpecialFolder.MyVideos), false, false, true, TimeSpan.FromMinutes(1), true, 20, 2, true, true);
-        DownloadSettings = new DownloadSettings("mp3", false, YoutubeHelpers.High720, false, false, false, false, "192", false, "en", false, false, 0, 0, false, true, false, true, 4, "$title", false, "mkv", "default");
-        SaveConsts();
+        DownloadSettings = new DownloadSettings("mp3", false, YoutubeHelpers.High720, false, false, false, false, "192", false, "en", true, false, 0, 0, false, true, false, true, 4, "$title", false, "mkv", "default");
+        NySaveConsts();
     }
-    public static void LoadConsts()
+    public static void NyLoadConsts()
     {
 
         if (!File.Exists(ConfigFilePath))
         {
-            Log("Config file does not exist, restoring defaults", "LoadConsts at GlobalConsts").Wait();
+            NyLog("Config file does not exist, restoring defaults", "LoadConsts at GlobalConsts").Wait();
 
-            RestoreDefualts();
+            NyRestoreDefualts();
             return;
         }
 
@@ -175,35 +188,37 @@ static class GlobalConsts
             settings = JsonConvert.DeserializeObject<Objects.Settings>(File.ReadAllText(ConfigFilePath));
             ConversionsLocker = new SemaphoreSlim(settings.ActualConversionsLimit, settings.MaximumConversionsCount);
 
-            LoadDownloadSettings();
+            NyLoadDownloadSettings();
         }
         catch (Exception ex)
         {
-            Log(ex.ToString(), "LoadConsts at GlobalConsts").Wait();
-            RestoreDefualts();
+            NyLog(ex.ToString(), "LoadConsts at GlobalConsts").Wait();
+            NyRestoreDefualts();
         }
-        UpdateTheme();
-        UpdateLanguage();
+        settings.Language = AppLanguage.FromSystem();
+        NyUpdateTheme();
+        NyUpdateLanguage();
+        NySaveConsts();
 
     }
-    public static void CreateTempFolder()
+    public static void NyCreateTempFolder()
     {
         try
         {
-            if (!Directory.Exists(Path.GetTempPath() + "YoutubePlaylistDownloader"))
-                Directory.CreateDirectory(Path.GetTempPath() + "YoutubePlaylistDownloader");
+            if (!Directory.Exists(AppPaths.TempDirectory))
+                Directory.CreateDirectory(AppPaths.TempDirectory);
         }
         catch (Exception ex)
         {
-            Log($"Failed to create temp folder, {ex}", "CreateTempFolder at GlobalConsts").Wait();
+            NyLog($"Failed to create temp folder, {ex}", "CreateTempFolder at GlobalConsts").Wait();
         }
 
     }
-    public static void CleanTempFolder()
+    public static void NyCleanTempFolder()
     {
-        if (Directory.Exists(Path.GetTempPath() + "YoutubePlaylistDownloader"))
+        if (Directory.Exists(AppPaths.TempDirectory))
         {
-            DirectoryInfo di = new(Path.GetTempPath() + "YoutubePlaylistDownloader");
+            DirectoryInfo di = new(AppPaths.TempDirectory);
 
             foreach (var file in di.GetFiles())
                 try { file.Delete(); } catch { };
@@ -212,7 +227,7 @@ static class GlobalConsts
                 try { dir.Delete(true); } catch { };
         }
     }
-    private static void UpdateTheme()
+    private static void NyUpdateTheme()
     {
         try
         {
@@ -221,38 +236,57 @@ static class GlobalConsts
         }
         catch (Exception ex)
         {
-            RestoreDefualts();
-            Log(ex.ToString(), "UpdateTheme").ConfigureAwait(false);
+            NyRestoreDefualts();
+            NyLog(ex.ToString(), "UpdateTheme").ConfigureAwait(false);
         }
     }
-    private static void UpdateLanguage()
+    private static void NyUpdateLanguage() => NyChangeLanguage(settings.Language);
+
+    public static void NyChangeLanguage(string nLang)
     {
-        var toRemove = Application.Current.Resources.MergedDictionaries.First(x => x.Source.OriginalString.Contains("English"));
-        ResourceDictionary r = new()
+        if (string.IsNullOrWhiteSpace(nLang))
+            nLang = "English";
+
+        var dictionaries = Application.Current.Resources.MergedDictionaries;
+        foreach (var dictionary in dictionaries.Where(IsAppLanguageDictionary).ToList())
+            dictionaries.Remove(dictionary);
+
+        dictionaries.Add(LoadLanguage("English"));
+        if (!string.Equals(nLang, "English", StringComparison.OrdinalIgnoreCase))
         {
-            Source = new Uri($"/Languages/{settings.Language}.xaml", UriKind.Relative)
-        };
-        Application.Current.Resources.MergedDictionaries.Add(r);
-        Application.Current.Resources.MergedDictionaries.Remove(toRemove);
-    }
-    public static void ChangeLanguage(string nLang)
-    {
-        var toRemove = Application.Current.Resources.MergedDictionaries.First(x => x.Source?.OriginalString.Contains(settings.Language) ?? false);
-        ResourceDictionary r = new()
-        {
-            Source = new Uri($"/Languages/{nLang}.xaml", UriKind.Relative)
-        };
-        Application.Current.Resources.MergedDictionaries.Add(r);
-        Application.Current.Resources.MergedDictionaries.Remove(toRemove);
+            try
+            {
+                dictionaries.Add(LoadLanguage(nLang));
+            }
+            catch (Exception ex)
+            {
+                NyLog(ex.ToString(), "ChangeLanguage").Wait();
+                nLang = "English";
+            }
+        }
+
         settings.Language = nLang;
     }
-    public static async Task Log(string message, object sender)
+
+    private static bool IsAppLanguageDictionary(ResourceDictionary dictionary)
+    {
+        var source = dictionary.Source?.OriginalString;
+        return !string.IsNullOrWhiteSpace(source)
+            && source.Contains("/Languages/", StringComparison.OrdinalIgnoreCase)
+            && !source.Contains("LanguagesList", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static ResourceDictionary LoadLanguage(string name) => new()
+    {
+        Source = new Uri($"/Languages/{name}.xaml", UriKind.Relative)
+    };
+    public static async Task NyLog(string message, object sender)
     {
         using StreamWriter sw = new(ErrorFilePath, true);
         await sw.WriteLineAsync($"[{DateTime.Now.ToUniversalTime()}], [{sender}]:\n\n{message}\n\n").ConfigureAwait(false);
 
     }
-    public static string CleanFileName(string filename)
+    public static string NyCleanFileName(string filename)
     {
         var invalidChars = Regex.Escape(new string(Path.GetInvalidFileNameChars()));
         var invalidReStr = string.Format(@"[{0}]+", invalidChars);
@@ -274,7 +308,7 @@ static class GlobalConsts
         return sanitisedNamePart;
     }
 
-    static void CropAndSaveImage(byte[] imageBytes, string imagePath)
+    static void NyCropAndSaveImage(byte[] imageBytes, string imagePath)
     {
         using var imageBuffer = new MemoryStream(imageBytes);
         using var image = System.Drawing.Image.FromStream(imageBuffer);
@@ -290,7 +324,7 @@ static class GlobalConsts
     internal static readonly string[] ArtistsSeparators = ["&", "feat.", "feat", "ft.", " ft ", "Feat.", " x ", " X "];
     internal static readonly string[] VideoTitleSeparators = [" - ", " — "];
 
-    static async Task<string> TagMusicFile(Video fullVideo, string file, int vIndex)
+    static async Task<string> NyTagMusicFile(Video fullVideo, string file, int vIndex)
     {
         // Index YouTube Auto Generated Description
         var description = fullVideo.Description.Split("\n");
@@ -352,7 +386,7 @@ static class GlobalConsts
         }
         catch (Exception e)
         {
-            await Log(e.ToString(), "TagMusicFile inside description loop").ConfigureAwait(false);
+            await NyLog(e.ToString(), "TagMusicFile inside description loop").ConfigureAwait(false);
             return null;
         }
 
@@ -372,19 +406,19 @@ static class GlobalConsts
 
             try
             {
-                var picturePath = $"{TempFolderPath}{CleanFileName(fullVideo.Title)}.jpg";
+                var picturePath = $"{TempFolderPath}{NyCleanFileName(fullVideo.Title)}.jpg";
 
                 using (var httpClient = new HttpClient())
                 {
                     var pictureContent = await httpClient.GetByteArrayAsync($"https://img.youtube.com/vi/{fullVideo.Id}/maxresdefault.jpg").ConfigureAwait(false);
-                    CropAndSaveImage(pictureContent, picturePath);
+                    NyCropAndSaveImage(pictureContent, picturePath);
                 }
 
                 tagLibFile.Tag.Pictures = [new TagLib.Picture(picturePath)];
             }
             catch (Exception ex)
             {
-                await Log("Failed to add picture to file at TagMusicFile", ex.ToString()).ConfigureAwait(false);
+                await NyLog("Failed to add picture to file at TagMusicFile", ex.ToString()).ConfigureAwait(false);
             }
 
             tagLibFile.Save();
@@ -393,7 +427,7 @@ static class GlobalConsts
         return $"{string.Join(", ", artists)} - {title}";
     }
 
-    public static async Task<string> TagFileBasedOnTitle(IVideo video, int index, string file, FullPlaylist playlist = null)
+    public static async Task<string> NyTagFileBasedOnTitle(IVideo video, int index, string file, FullPlaylist playlist = null)
     {
         var title = video.Title.Replace("—", "-");
         var genre = title.Split('[', ']').ElementAtOrDefault(1);
@@ -435,7 +469,7 @@ static class GlobalConsts
                 tagLibFile.Tag.Genres = genre.Split('/', '\\');
             }
 
-            if (TryGetSongTitleAndPerformersFromTitle(title, out string songTitle, out string[] songPerformers))
+            if (NyTryGetSongTitleAndPerformersFromTitle(title, out string songTitle, out string[] songPerformers))
             {
                 tagLibFile.Tag.Title = songTitle;
                 tagLibFile.Tag.Performers = songPerformers;
@@ -443,11 +477,13 @@ static class GlobalConsts
 
             try
             {
-                var picturePath = $"{TempFolderPath}{CleanFileName(video.Title)}.jpg";
+                var picturePath = $"{TempFolderPath}{NyCleanFileName(video.Title)}.jpg";
+                var pictureUrl = video.Thumbnails?.TryGetWithHighestResolution()?.Url
+                    ?? $"https://img.youtube.com/vi/{video.Id}/maxresdefault.jpg";
 
                 using (var httpClient = new HttpClient())
                 {
-                    var response = await httpClient.GetAsync($"https://img.youtube.com/vi/{video.Id}/maxresdefault.jpg").ConfigureAwait(false);
+                    var response = await httpClient.GetAsync(pictureUrl).ConfigureAwait(false);
 
                     using (var pictureStream = File.Create(picturePath))
                     {
@@ -459,7 +495,7 @@ static class GlobalConsts
             }
             catch (Exception ex)
             {
-                await Log("Failed to add picture to file at TagFileBasedOnTitle", ex.ToString()).ConfigureAwait(false);
+                await NyLog("Failed to add picture to file at TagFileBasedOnTitle", ex.ToString()).ConfigureAwait(false);
             }
 
             tagLibFile.Save();
@@ -468,7 +504,7 @@ static class GlobalConsts
         return file;
     }
 
-    public static bool TryGetSongTitleAndPerformersFromTitle(string title, out string songTitle, out string[] songPerformers)
+    public static bool NyTryGetSongTitleAndPerformersFromTitle(string title, out string songTitle, out string[] songPerformers)
     {
         songTitle = null;
         songPerformers = null;
@@ -497,9 +533,14 @@ static class GlobalConsts
         return false;
     }
 
-    public static async Task<string> TagFile(IVideo video, int vIndex, string file, FullPlaylist playlist = null)
+    public static async Task<string> NyTagFile(IVideo video, int vIndex, string file, FullPlaylist playlist = null)
     {
         ArgumentNullException.ThrowIfNull(video);
+
+        if (video is GenericVideo)
+        {
+            return await NyTagFileBasedOnTitle(video, vIndex, file, playlist);
+        }
 
         if (!VideoTitleSeparators.Any(video.Title.Contains))
         {
@@ -507,7 +548,7 @@ static class GlobalConsts
 
             if (fullVideo.Description.Contains("Auto-generated by YouTube."))
             {
-                var fileName = await TagMusicFile(fullVideo, file, vIndex);
+                var fileName = await NyTagMusicFile(fullVideo, file, vIndex);
 
                 if (fileName != null)
                 {
@@ -516,37 +557,39 @@ static class GlobalConsts
             }
         }
 
-        return await TagFileBasedOnTitle(video, vIndex, file, playlist);
+        return await NyTagFileBasedOnTitle(video, vIndex, file, playlist);
     }
 
-    public static void LoadFlyoutPage(UserControl page)
+    public static void NyLoadFlyoutPage(UserControl page)
     {
         Current.DefaultFlyoutUserControl.Content = page;
         Current.DefaultFlyout.IsOpen = true;
     }
 
-    public static void CloseFlyout()
+    public static void NyCloseFlyout()
     {
         Current.DefaultFlyout.IsOpen = false;
         Current.DefaultFlyoutUserControl.Content = null;
     }
 
-    public static double GetOffset()
+    public static double NyGetOffset()
     {
         return Current.ActualHeight - 95;
     }
 
-    private static void LoadDownloadSettings()
+    private static void NyLoadDownloadSettings()
     {
         if (File.Exists(DownloadSettingsFilePath))
         {
             try
             {
                 downloadSettings = JsonConvert.DeserializeObject<DownloadSettings>(File.ReadAllText(DownloadSettingsFilePath));
+                if (downloadSettings != null)
+                    DownloadGate.Limit = DownloadSettings.NormalizeSimultaneousDownloads(downloadSettings.MaxSimultaneousDownloads);
             }
             catch (Exception ex)
             {
-                Log(ex.ToString(), "LoadDownloadSettings at GlobalConsts").Wait();
+                NyLog(ex.ToString(), "LoadDownloadSettings at GlobalConsts").Wait();
                 try
                 {
                     if (File.Exists(DownloadSettingsFilePath))
@@ -554,18 +597,18 @@ static class GlobalConsts
                 }
                 catch (Exception ex2)
                 {
-                    Log(ex2.ToString(), "Delete download settings file path").Wait();
+                    NyLog(ex2.ToString(), "Delete download settings file path").Wait();
                 }
-                downloadSettings = new DownloadSettings("mp3", false, YoutubeHelpers.High720, false, false, false, false, "192", false, "en", false, false, 0, 0, false, true, false, true, 4, "$title", false, "mkv", "default");
+                downloadSettings = new DownloadSettings("mp3", false, YoutubeHelpers.High720, false, false, false, false, "192", false, "en", true, false, 0, 0, false, true, false, true, 4, "$title", false, "mkv", "default");
             }
         }
         else
         {
-            downloadSettings = new DownloadSettings("mp3", false, YoutubeHelpers.High720, false, false, false, false, "192", false, "en", false, false, 0, 0, false, true, false, true, 4, "$title", false, "mkv", "default");
+            downloadSettings = new DownloadSettings("mp3", false, YoutubeHelpers.High720, false, false, false, false, "192", false, "en", true, false, 0, 0, false, true, false, true, 4, "$title", false, "mkv", "default");
         }
     }
 
-    public static void SaveDownloadSettings()
+    public static void NySaveDownloadSettings()
     {
         try
         {
@@ -573,22 +616,97 @@ static class GlobalConsts
         }
         catch (Exception ex)
         {
-            Log(ex.ToString(), "SaveDownloadSettings at GlobalConsts").Wait();
+            NyLog(ex.ToString(), "SaveDownloadSettings at GlobalConsts").Wait();
         }
     }
 
-    private static void Downloads_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-    {
-        if (e.Action == NotifyCollectionChangedAction.Add)
-            foreach (QueuedDownload item in e.NewItems)
-                MainPage.QueueStackPanel.Children.Add(item?.GetDisplayGrid());
+    public static void MoveDownload(QueuedDownload item, int delta) => MoveDownloads([item], delta);
 
+    public static void MoveDownloadToTop(QueuedDownload item) => MoveDownloadsToEdge([item], toTop: true);
+
+    public static void MoveDownloads(IReadOnlyList<QueuedDownload> items, int delta)
+    {
+        var ordered = OrderedDownloads(items);
+        if (ordered.Count == 0 || delta == 0)
+            return;
+        if (delta < 0)
+        {
+            if (Downloads.IndexOf(ordered[0]) == 0)
+                return;
+            foreach (var item in ordered)
+                MoveOne(item, -1);
+        }
+        else
+        {
+            if (Downloads.IndexOf(ordered[^1]) == Downloads.Count - 1)
+                return;
+            for (var i = ordered.Count - 1; i >= 0; i--)
+                MoveOne(ordered[i], 1);
+        }
+
+        PersistDownloadOrder();
+    }
+
+    public static void MoveDownloadsToEdge(IReadOnlyList<QueuedDownload> items, bool toTop)
+    {
+        var ordered = OrderedDownloads(items);
+        if (ordered.Count == 0)
+            return;
+        if (toTop)
+        {
+            for (var i = 0; i < ordered.Count; i++)
+            {
+                var index = Downloads.IndexOf(ordered[i]);
+                if (index != i)
+                    Downloads.Move(index, i);
+            }
+        }
+        else
+        {
+            for (var i = ordered.Count - 1; i >= 0; i--)
+            {
+                var index = Downloads.IndexOf(ordered[i]);
+                var target = Downloads.Count - (ordered.Count - i);
+                if (index != target)
+                    Downloads.Move(index, target);
+            }
+        }
+
+        PersistDownloadOrder();
+    }
+
+    private static List<QueuedDownload> OrderedDownloads(IReadOnlyList<QueuedDownload> items)
+    {
+        if (items == null || items.Count == 0)
+            return [];
+        return items.Where(item => item != null && Downloads.Contains(item))
+            .Distinct()
+            .OrderBy(Downloads.IndexOf)
+            .ToList();
+    }
+
+    private static void MoveOne(QueuedDownload item, int delta)
+    {
+        var index = Downloads.IndexOf(item);
+        if (index < 0)
+            return;
+        var target = Math.Clamp(index + delta, 0, Downloads.Count - 1);
+        if (target == index)
+            return;
+        Downloads.Move(index, target);
+    }
+
+    private static void PersistDownloadOrder()
+    {
+        DownloadGate.NotifyQueueChanged();
+        DownloadQueueStore.SetOrder(Downloads.Select(x => x.JobId).Where(x => !string.IsNullOrWhiteSpace(x)).ToList());
+    }
+
+    private static void NyDownloads_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
         if (e.Action == NotifyCollectionChangedAction.Remove)
             foreach (QueuedDownload item in e.OldItems)
-            {
-                MainPage.QueueStackPanel.Children.Remove(item?.GetDisplayGrid());
                 item?.Dispose();
-            }
     }
 
     #endregion

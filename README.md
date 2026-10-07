@@ -1,22 +1,22 @@
-# YouTube Playlist Downloader
+# NewYoutubeDownloader
 
-# Stand with Israel!
-
-## If the files don't show up after you download a playlist, try running the program as administrator or change the save directory to a different drive! (C drive is usually protected by windows, save it under D or any other drive)
-
-## What is it?
-A simple program to download whole playlists\channels or even single videos from YouTube 
-
-[Click here to download the installer](https://github.com/shaked6540/YoutubePlaylistDownloader/releases/download/1.9.34/YoutubePlaylistDownloader.exe) 
+A Windows app for downloading videos, playlists and channels from YouTube, Rutube and VK Video.
 
 ## Features
-- No ads, open source and free
-- Convert videos to a lot of popular formats
-- Themes, and user friendly interface
-- Automatic tagging of artists, album, title and genre based on the video title
-- Comfortable update system
-- Multi-language support: English, Arabic, Chinese, Dutch (NL), French, German, Hebrew, Italian, Polish, Portuguese (BR), Romanian, Russian, Spanish, and Turkish
 
-## Screenshots
-![Gif](https://i.imgur.com/bQw4fVm.gif "Gif")
+- YouTube, Rutube and VK Video
+- Playlists in their own folders, numbered files and an `.m3u` playback list
+- Queue, limited simultaneous downloads, resume after restart
+- Optional sign-in for restricted YouTube and Rutube content
+- Convert to common audio and video formats
+- Themes and multiple languages
 
+Public videos download without an account. Sign in under Settings when a source requires a session.
+
+Version 0.1.
+
+Place `ffmpeg.exe` next to `NewYoutubeDownloader.exe`. The project copies `tools\yt-dlp.exe` beside the program when it builds.
+
+```
+dotnet build YoutubePlaylistDownloader\YoutubePlaylistDownloader.csproj -c Release
+```

@@ -9,103 +9,94 @@ public partial class Settings : UserControl
     public Settings()
     {
         InitializeComponent();
-        FillAccents();
-        FillLanguages();
+        NyFillAccents();
+        NyFillLanguages();
 
         if (GlobalConsts.settings.Theme == "Dark") NightModeCheckBox.IsChecked = true;
-        CheckForUpdatesCheckBox.IsChecked = GlobalConsts.settings.CheckForProgramUpdates;
         SaveDownloadOptionsCheckBox.IsChecked = GlobalConsts.settings.SaveDownloadOptions;
         LimitConversionsCheckBox.IsChecked = GlobalConsts.settings.LimitConversions;
         ConfirmOnExitCheckBox.IsChecked = GlobalConsts.settings.ConfirmExit;
         ActualConversionTextBox.Text = GlobalConsts.settings.ActualConversionsLimit.ToString();
-        ActualConversionTextBox.TextChanged += ActualConversionTextBox_TextChanged;
+        ActualConversionTextBox.TextChanged += NyActualConversionTextBox_TextChanged;
 
-        NightModeCheckBox.Checked += NightModeCheckBox_Checked;
-        NightModeCheckBox.Unchecked += NightModeCheckBox_Unchecked;
+        NightModeCheckBox.Checked += NyNightModeCheckBox_Checked;
+        NightModeCheckBox.Unchecked += NyNightModeCheckBox_Unchecked;
+        RefreshYouTubeAccountStatus();
+        RefreshRutubeAccountStatus();
 
-        GlobalConsts.HideSettingsButton();
-        GlobalConsts.ShowHomeButton();
-        GlobalConsts.ShowAboutButton();
-        GlobalConsts.ShowHelpButton();
+        GlobalConsts.NyHideSettingsButton();
+        GlobalConsts.NyShowHomeButton();
+        GlobalConsts.NyShowAboutButton();
+        GlobalConsts.NyShowHelpButton();
     }
 
-    private void FillLanguages()
+    private void NyFillLanguages()
     {
         var languages = ((string)FindResource("LanguageList")).Split(';');
         LanguageComboBox.ItemsSource = languages;
         LanguageComboBox.SelectedItem = GlobalConsts.settings.Language;
     }
 
-    private void FillAccents()
+    private void NyFillAccents()
     {
         var accents = ThemeManager.Current.ColorSchemes;
         comboBox.ItemsSource = accents;
         comboBox.SelectedItem = ((IEnumerable<string>)comboBox.ItemsSource).FirstOrDefault(x => x == GlobalConsts.settings.Accent);
     }
 
-    private void NightModeCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyNightModeCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         ThemeManager.Current.ChangeTheme(Application.Current, $"Dark.{GlobalConsts.settings.Accent}");
         ThemeManager.Current.ChangeTheme(Application.Current, $"Light.{GlobalConsts.settings.Accent}");
         GlobalConsts.settings.Theme = "Light";
     }
 
-    private void NightModeCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyNightModeCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         ThemeManager.Current.ChangeTheme(Application.Current, $"Light.{GlobalConsts.settings.Accent}");
         ThemeManager.Current.ChangeTheme(Application.Current, $"Dark.{GlobalConsts.settings.Accent}");
         GlobalConsts.settings.Theme = "Dark";
     }
 
-    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void NyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         ThemeManager.Current.ChangeTheme(Application.Current, $"{GlobalConsts.settings.Theme}.{comboBox.SelectedItem}");
         GlobalConsts.settings.Accent = (string)comboBox.SelectedItem;
     }
 
-    private void Exit_Click(object sender, RoutedEventArgs e)
+    private void NyExit_Click(object sender, RoutedEventArgs e)
     {
-        GlobalConsts.SaveConsts();
-        GlobalConsts.LoadPage(GlobalConsts.MainPage.Load());
+        GlobalConsts.NySaveConsts();
+        GlobalConsts.NyLoadPage(GlobalConsts.MainPage.NyLoad());
     }
 
-    private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void NyLanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        GlobalConsts.ChangeLanguage((string)LanguageComboBox.SelectedItem);
+        GlobalConsts.NyChangeLanguage((string)LanguageComboBox.SelectedItem);
         FlowDirection = (FlowDirection)FindResource("FlowDirection");
     }
 
-    private void CheckBox_Checked(object sender, RoutedEventArgs e)
-    {
-        GlobalConsts.settings.CheckForProgramUpdates = CheckForUpdatesCheckBox.IsChecked.Value;
-    }
-
-    private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
-    {
-        GlobalConsts.settings.CheckForProgramUpdates = CheckForUpdatesCheckBox.IsChecked.Value;
-    }
-
-    private void SaveDownloadOptionsCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NySaveDownloadOptionsCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         GlobalConsts.settings.SaveDownloadOptions = SaveDownloadOptionsCheckBox.IsChecked.Value;
     }
 
-    private void SaveDownloadOptionsCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NySaveDownloadOptionsCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         GlobalConsts.settings.SaveDownloadOptions = SaveDownloadOptionsCheckBox.IsChecked.Value;
     }
 
-    private void LimitConversionsCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyLimitConversionsCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         GlobalConsts.settings.LimitConversions = LimitConversionsCheckBox.IsChecked.Value;
     }
 
-    private void LimitConversionsCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyLimitConversionsCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         GlobalConsts.settings.LimitConversions = LimitConversionsCheckBox.IsChecked.Value;
     }
 
-    private void ActualConversionTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private void NyActualConversionTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (int.TryParse(ActualConversionTextBox.Text, out var actual) && actual > 0 && actual < GlobalConsts.settings.MaximumConversionsCount)
         {
@@ -129,13 +120,103 @@ public partial class Settings : UserControl
         }
     }
 
-    private void ConfirmOnExitCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyConfirmOnExitCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         GlobalConsts.settings.ConfirmExit = ConfirmOnExitCheckBox.IsChecked.Value;
     }
 
-    private void ConfirmOnExitCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyConfirmOnExitCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         GlobalConsts.settings.ConfirmExit = ConfirmOnExitCheckBox.IsChecked.Value;
+    }
+
+    private void RefreshYouTubeAccountStatus()
+    {
+        YouTubeAccountStatus.Text = YoutubeSession.Current.IsSignedIn
+            ? (string)FindResource("YouTubeSignedIn")
+            : (string)FindResource("YouTubeSignedOut");
+    }
+
+    private void SignInYouTube_Click(object sender, RoutedEventArgs e)
+    {
+        var window = new YoutubeLoginWindow
+        {
+            Owner = Window.GetWindow(this)
+        };
+        window.ShowDialog();
+        RefreshYouTubeAccountStatus();
+    }
+
+    private async void ImportFirefox_Click(object sender, RoutedEventArgs e)
+    {
+        if (!YtDlpDownloader.IsAvailable)
+        {
+            await GlobalConsts.NyShowMessage((string)FindResource("Error"), "yt-dlp.exe");
+            return;
+        }
+
+        if (!YoutubeSession.Current.TryImportFirefox(YtDlpDownloader.ExePath, out var error)
+            || !YoutubeSession.Current.IsSignedIn)
+        {
+            await GlobalConsts.NyShowMessage(
+                (string)FindResource("Error"),
+                (string)FindResource("FirefoxCookiesNotFound") + (string.IsNullOrWhiteSpace(error) ? "" : "\n" + error)
+            );
+            RefreshYouTubeAccountStatus();
+            return;
+        }
+
+        RefreshYouTubeAccountStatus();
+    }
+
+    private void SignOutYouTube_Click(object sender, RoutedEventArgs e)
+    {
+        YoutubeSession.Current.Clear();
+        RefreshYouTubeAccountStatus();
+    }
+
+    private void RefreshRutubeAccountStatus()
+    {
+        RutubeAccountStatus.Text = RutubeSession.Current.IsSignedIn
+            ? (string)FindResource("RutubeSignedIn")
+            : (string)FindResource("RutubeSignedOut");
+    }
+
+    private void SignInRutube_Click(object sender, RoutedEventArgs e)
+    {
+        var window = new RutubeLoginWindow
+        {
+            Owner = Window.GetWindow(this)
+        };
+        window.ShowDialog();
+        RefreshRutubeAccountStatus();
+    }
+
+    private async void ImportFirefoxRutube_Click(object sender, RoutedEventArgs e)
+    {
+        if (!YtDlpDownloader.IsAvailable)
+        {
+            await GlobalConsts.NyShowMessage((string)FindResource("Error"), "yt-dlp.exe");
+            return;
+        }
+
+        if (!RutubeSession.Current.TryImportFirefox(YtDlpDownloader.ExePath, out var error)
+            || !RutubeSession.Current.IsSignedIn)
+        {
+            await GlobalConsts.NyShowMessage(
+                (string)FindResource("Error"),
+                (string)FindResource("FirefoxRutubeCookiesNotFound") + (string.IsNullOrWhiteSpace(error) ? "" : "\n" + error)
+            );
+            RefreshRutubeAccountStatus();
+            return;
+        }
+
+        RefreshRutubeAccountStatus();
+    }
+
+    private void SignOutRutube_Click(object sender, RoutedEventArgs e)
+    {
+        RutubeSession.Current.Clear();
+        RefreshRutubeAccountStatus();
     }
 }

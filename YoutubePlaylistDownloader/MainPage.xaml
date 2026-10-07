@@ -3,117 +3,255 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-             Margin="5"
-             Width="{Binding ActualWidth, ElementName=Skeleton}"
+             xmlns:local="clr-namespace:YoutubePlaylistDownloader"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch"
              FlowDirection="{DynamicResource FlowDirection}">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" HorizontalAlignment="Center" Text="{DynamicResource Title}" FontSize="24" Foreground="{DynamicResource MahApps.Brushes.Accent}" Margin="5" />
+    <Controls:MetroAnimatedTabControl x:Name="MetroAnimatedTabControl">
+        <Controls:MetroTabItem Header="{DynamicResource Search}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-        <Controls:MetroAnimatedTabControl Grid.Row="1" x:Name="MetroAnimatedTabControl">
-            <Controls:MetroTabItem Header="{DynamicResource Search}">
-                <Grid x:Name="SearchPlaylistGrid" MinWidth="1200" >
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" x:Name="HeadlineStackPanel" HorizontalAlignment="Stretch" >
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Controls:Tile Cursor="Hand" Grid.Column="0" Width="50" Height="32.5" HorizontalAlignment="Left" Margin="0" Click="Tile_Click" >
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <iconPacks:PackIconModern Panel.ZIndex="5" HorizontalAlignment="Center" Grid.Row="0" Kind="Cog" Width="20" Height="20" Margin="0" />
-                                <TextBlock Panel.ZIndex="0" Grid.Row="1" Text="{DynamicResource Options}" FontSize="10" VerticalAlignment="Bottom"  />
-                            </Grid>
-                        </Controls:Tile>
-                        <TextBox Grid.Column="1" HorizontalAlignment="Stretch"  x:Name="PlaylistLinkTextBox" Margin="5" FontSize="18" TextChanged="TextBox_TextChanged" Style="{StaticResource SeachBarPlaceHolder}" Tag="{DynamicResource InsertYoutubePlaylistLinkHere}"  />
-                    </Grid>
-                    <ScrollViewer Grid.Row="1" x:Name="GridScrollViewer" VerticalScrollBarVisibility="Auto">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0" Visibility="Collapsed" x:Name="PlaylistInfoGrid" Margin="7,0" HorizontalAlignment="Left" Width="Auto" MaxHeight="410" >
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-
-                                <!--Col 0-->
-                                <Image x:Name="PlaylistInfoImage" Margin="0,0,10,0" Grid.Column="0" Grid.Row="0" Grid.RowSpan="5" MaxWidth="320" MaxHeight="180" />
-
-                                <!--Col 1-->
-                                <TextBlock Text="{DynamicResource PlaylistTitle}" Grid.Row="0" Grid.Column="1" FontSize="14" />
-                                <TextBlock Text="{DynamicResource Author}"        Grid.Row="1" Grid.Column="1" FontSize="14"/>
-                                <TextBlock Text="{DynamicResource Views}"         Grid.Row="2" Grid.Column="1" FontSize="14"/>
-                                <TextBlock Text="{DynamicResource TotalVideos}"   Grid.Row="3" Grid.Column="1" FontSize="14" x:Name="PlaylistTotalVideosTextBlockText" />
-
-                                <!--Col 2-->
-
-                                <TextBlock x:Name="PlaylistTitleTextBlock"        Grid.Row="0" Grid.Column="2" FontSize="14"/>
-                                <TextBlock x:Name="PlaylistAuthorTextBlock"       Grid.Row="1" Grid.Column="2" FontSize="14"/>
-                                <TextBlock x:Name="PlaylistViewsTextBlock"        Grid.Row="2" Grid.Column="2" FontSize="14"/>
-                                <TextBlock x:Name="PlaylistTotalVideosTextBlock"  Grid.Row="3" Grid.Column="2" FontSize="14"/>
-
-                            </Grid>
-                            <WrapPanel Grid.Row="1" HorizontalAlignment="Center">
-                                <Controls:Tile Style="{DynamicResource SmallTileStyle}" x:Name="DownloadButton" Title="{DynamicResource Download}" IsEnabled="False" MinWidth="200" Width="Auto" HorizontalTitleAlignment="Center" Click="DownloadButton_Click">
-                                    <iconPacks:PackIconModern Width="40" Height="40" Kind="ArrowDown" />
-                                </Controls:Tile>
-                                <Controls:Tile Style="{DynamicResource SmallTileStyle}" x:Name="DownloadInBackgroundButton" Title="{DynamicResource DownloadInBackground}" MinWidth="200" Width="Auto" HorizontalTitleAlignment="Center" IsEnabled="False" Click="DownloadInBackgroundButton_Click">
-                                    <iconPacks:PackIconModern Width="40" Height="40" Kind="Reset" />
-                                </Controls:Tile>
-                            </WrapPanel>
-                        </Grid>
-                    </ScrollViewer>
-                </Grid>
-
-            </Controls:MetroTabItem>
-            <Controls:MetroTabItem Header="{DynamicResource Queue}" x:Name="QueueMetroTabItem">
-                <Grid>
-                    <ScrollViewer x:Name="QueueScrollViewer" VerticalScrollBarVisibility="Auto" MinWidth="1200" MaxWidth="1200" >
-                        <StackPanel x:Name="QueueStackPanel">
+                <Grid Grid.Row="0" Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Click="NyTile_Click" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" ToolTip="{DynamicResource Options}">
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconModern Kind="Cog" Width="16" Height="16"/>
+                            <TextBlock Text="{DynamicResource Options}" Margin="8,0,0,0"/>
                         </StackPanel>
-                    </ScrollViewer>
+                    </Button>
+                    <TextBox Grid.Column="1" x:Name="PlaylistLinkTextBox" FontSize="16" MinHeight="40" VerticalContentAlignment="Center"
+                             TextChanged="NyTextBox_TextChanged"
+                             Controls:TextBoxHelper.Watermark="{DynamicResource InsertYoutubePlaylistLinkHere}"
+                             Controls:TextBoxHelper.ClearTextButton="True"/>
                 </Grid>
-            </Controls:MetroTabItem>
 
-            <Controls:MetroTabItem Header="{DynamicResource BulkDownload}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <ScrollViewer Grid.Row="0" x:Name="BulkScrollViewer" VerticalScrollBarVisibility="Auto" MinWidth="1200" MaxWidth="1200" >
-                        <TextBox x:Name="BulkLinksTextBox" AcceptsReturn="True" TextWrapping="Wrap" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" TextChanged="TextBox_TextChanged_1" FontSize="16" PreviewDrop="BulkLinksTextBox_PreviewDrop"  />
-                    </ScrollViewer>
-                    <WrapPanel Grid.Row="1" HorizontalAlignment="Center">
-                        <Controls:Tile Style="{DynamicResource SmallTileStyle}" x:Name="BulkDownloadButton" Title="{DynamicResource Download}" MinWidth="200" Width="Auto" HorizontalTitleAlignment="Center" IsEnabled="False" Click="BulkDownloadButton_Click">
-                            <iconPacks:PackIconModern Width="40" Height="40" Kind="ArrowDown" />
-                        </Controls:Tile>
-                    </WrapPanel>
+                <ScrollViewer Grid.Row="1" x:Name="GridScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <Border x:Name="PlaylistInfoGrid" Style="{StaticResource CardBorder}" Visibility="Collapsed">
+                            <WrapPanel>
+                                <Image x:Name="PlaylistInfoImage" Margin="0,0,16,8" MaxWidth="280" MaxHeight="158" Stretch="Uniform" VerticalAlignment="Top"/>
+                                <Grid MinWidth="240">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="{DynamicResource PlaylistTitle}" Grid.Row="0" Grid.Column="0" Margin="0,0,12,6" Opacity="0.7"/>
+                                    <TextBlock x:Name="PlaylistTitleTextBlock" Grid.Row="0" Grid.Column="1" TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                    <TextBlock Text="{DynamicResource Author}" Grid.Row="1" Grid.Column="0" Margin="0,0,12,6" Opacity="0.7"/>
+                                    <TextBlock x:Name="PlaylistAuthorTextBlock" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                    <TextBlock Text="{DynamicResource Views}" Grid.Row="2" Grid.Column="0" Margin="0,0,12,6" Opacity="0.7"/>
+                                    <TextBlock x:Name="PlaylistViewsTextBlock" Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                                    <TextBlock Text="{DynamicResource TotalVideos}" Grid.Row="3" Grid.Column="0" Margin="0,0,12,0" Opacity="0.7" x:Name="PlaylistTotalVideosTextBlockText"/>
+                                    <TextBlock x:Name="PlaylistTotalVideosTextBlock" Grid.Row="3" Grid.Column="1" TextWrapping="Wrap"/>
+                                </Grid>
+                            </WrapPanel>
+                        </Border>
+
+                        <Border x:Name="RelatedPlaylistsPanel" Style="{StaticResource CardBorder}" Visibility="Collapsed">
+                            <StackPanel>
+                                <WrapPanel>
+                                    <Button x:Name="FindRelatedPlaylistsButton" Content="{DynamicResource FindRelatedPlaylists}" Click="FindRelatedPlaylists_Click" Style="{StaticResource SecondaryButton}"/>
+                                    <Button x:Name="AddRelatedPlaylistsButton" Content="{DynamicResource AddRelatedPlaylistsToBulk}" Click="AddRelatedPlaylists_Click" Style="{StaticResource SecondaryButton}" IsEnabled="False"/>
+                                    <TextBlock x:Name="RelatedPlaylistsStatus" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,8,0,8"/>
+                                </WrapPanel>
+                                <ListBox x:Name="RelatedPlaylistsList" MaxHeight="200" Margin="0,8,0,0" DisplayMemberPath="Display" SelectionMode="Extended"/>
+                            </StackPanel>
+                        </Border>
+
+                        <WrapPanel>
+                            <Button x:Name="DownloadButton" Style="{StaticResource ActionButton}" IsEnabled="False" Click="NyDownloadButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconModern Width="16" Height="16" Kind="ArrowDown"/>
+                                    <TextBlock Text="{DynamicResource Download}" Margin="8,0,0,0"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="DownloadInBackgroundButton" Style="{StaticResource SecondaryButton}" IsEnabled="False" Click="NyDownloadInBackgroundButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconModern Width="16" Height="16" Kind="InboxIn"/>
+                                    <TextBlock Text="{DynamicResource DownloadInBackground}" Margin="8,0,0,0"/>
+                                </StackPanel>
+                            </Button>
+                        </WrapPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Controls:MetroTabItem>
+
+        <Controls:MetroTabItem Header="{DynamicResource Queue}" x:Name="QueueMetroTabItem">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="240" MinHeight="140"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <WrapPanel Grid.Row="0" Margin="0,0,0,8">
+                    <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource Pause}" Click="QueuePause_Click"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource Resume}" Click="QueueResume_Click"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource MoveUp}" Click="QueueUp_Click"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource MoveDown}" Click="QueueDown_Click"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource MoveToTop}" Click="QueueTop_Click"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource MoveToBottom}" Click="QueueBottom_Click"/>
+                    <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource Cancel}" Click="QueueCancel_Click"/>
+                </WrapPanel>
+
+                <TextBox Grid.Row="1" x:Name="QueueFilterBox" Margin="0,0,0,8" MinWidth="220" HorizontalAlignment="Left"
+                         Controls:TextBoxHelper.Watermark="{DynamicResource QueueFilter}"
+                         Controls:TextBoxHelper.ClearTextButton="True"
+                         TextChanged="QueueFilter_TextChanged"/>
+
+                <DataGrid Grid.Row="2" x:Name="QueueGrid" AutoGenerateColumns="False" IsReadOnly="True"
+                          CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Extended" SelectionUnit="FullRow"
+                          HeadersVisibility="Column" GridLinesVisibility="Horizontal" EnableRowVirtualization="True"
+                          SelectionChanged="QueueGrid_SelectionChanged"
+                          PreviewMouseRightButtonDown="QueueGrid_PreviewMouseRightButtonDown"
+                          PreviewKeyDown="QueueGrid_PreviewKeyDown"
+                          MouseDoubleClick="QueueGrid_MouseDoubleClick">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu Opened="QueueJobMenu_Opened">
+                            <MenuItem Header="{DynamicResource Pause}" Click="QueuePause_Click"/>
+                            <MenuItem Header="{DynamicResource Resume}" Click="QueueResume_Click"/>
+                            <Separator/>
+                            <MenuItem Header="{DynamicResource MoveUp}" Click="QueueUp_Click"/>
+                            <MenuItem Header="{DynamicResource MoveDown}" Click="QueueDown_Click"/>
+                            <MenuItem Header="{DynamicResource MoveToTop}" Click="QueueTop_Click"/>
+                            <MenuItem Header="{DynamicResource MoveToBottom}" Click="QueueBottom_Click"/>
+                            <Separator/>
+                            <MenuItem Header="{DynamicResource Cancel}" Click="QueueCancel_Click"/>
+                            <MenuItem Tag="OpenFolder" Header="{DynamicResource OpenFolder}" Click="QueueOpenFolder_Click"/>
+                            <MenuItem Tag="CopyLink" Header="{DynamicResource CopyLink}" Click="QueueCopyLink_Click"/>
+                            <MenuItem Tag="CopyPath" Header="{DynamicResource CopyPath}" Click="QueueCopyPath_Click"/>
+                            <Separator/>
+                            <MenuItem Header="{DynamicResource SelectAll}" Click="QueueSelectAll_Click"/>
+                            <MenuItem Header="{DynamicResource ClearSelection}" Click="QueueClearSelection_Click"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{DynamicResource QueueName}" Binding="{Binding Title, Mode=OneWay}" Width="2*"/>
+                        <DataGridTextColumn Header="{DynamicResource CurrentFile}" Binding="{Binding CurrentTitle, Mode=OneWay}" Width="2*"/>
+                        <DataGridTextColumn Header="{DynamicResource DestinationFolder}" Binding="{Binding Destination, Mode=OneWay}" Width="*"/>
+                        <DataGridTemplateColumn Header="%" Width="140">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid Height="18" Margin="4,0">
+                                        <Controls:MetroProgressBar Minimum="0" Maximum="100" Value="{Binding CurrentProgressPercent, Mode=OneWay}"/>
+                                        <TextBlock Text="{Binding CurrentProgressPercent, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="{DynamicResource QueueState}" Binding="{Binding CurrentStatus, Mode=OneWay}" Width="140"/>
+                        <DataGridTextColumn Header="{DynamicResource DownloadSpeed}" Binding="{Binding CurrentDownloadSpeed, Mode=OneWay}" Width="120"/>
+                        <DataGridTextColumn Header="{DynamicResource TotalVideos}" Binding="{Binding TotalDownloaded, Mode=OneWay}" Width="90"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <GridSplitter Grid.Row="3" Height="6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext"/>
+
+                <Grid Grid.Row="4" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="280" MinWidth="200"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,12,0">
+                        <TextBlock Text="{DynamicResource QueueDetails}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <TextBlock x:Name="QueueSummaryText" TextWrapping="Wrap" FontWeight="SemiBold" Visibility="Collapsed"/>
+                        <StackPanel x:Name="QueueSingleInfo">
+                            <TextBlock Text="{Binding Title, Mode=OneWay}" TextWrapping="Wrap" FontWeight="SemiBold"/>
+                            <TextBlock Margin="0,8,0,0" Opacity="0.7" Text="{DynamicResource CurrentFile}"/>
+                            <TextBlock Text="{Binding CurrentTitle, Mode=OneWay}" TextWrapping="Wrap"/>
+                            <TextBlock Margin="0,8,0,0" Opacity="0.7" Text="{DynamicResource QueueState}"/>
+                            <TextBlock Text="{Binding CurrentStatus, Mode=OneWay}" TextWrapping="Wrap"/>
+                            <TextBlock Margin="0,8,0,0" Opacity="0.7" Text="{DynamicResource DestinationFolder}"/>
+                            <TextBlock Text="{Binding Destination, Mode=OneWay}" TextWrapping="Wrap"/>
+                            <TextBlock Margin="0,8,0,0" Opacity="0.7" Text="{DynamicResource Source}"/>
+                            <TextBlock Text="{Binding Source, Mode=OneWay}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <DockPanel Grid.Column="1">
+                        <WrapPanel DockPanel.Dock="Top">
+                            <TextBlock Text="{DynamicResource QueueFiles}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,12,8"/>
+                            <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource PauseFile}" Click="QueuePauseFile_Click"/>
+                            <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource ResumeFile}" Click="QueueResumeFile_Click"/>
+                            <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource Prioritize}" Click="QueuePrioritizeFile_Click"/>
+                            <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource RetryFile}" Click="QueueRetryFile_Click"/>
+                        </WrapPanel>
+                        <TextBlock x:Name="QueueFilesHint" Text="{DynamicResource QueueNoFiles}" Opacity="0.7" Margin="0,8,0,0" Visibility="Collapsed"/>
+                        <ListView x:Name="QueueFilesList" SelectionMode="Extended"
+                                  SelectionChanged="QueueFiles_SelectionChanged"
+                                  PreviewMouseRightButtonDown="QueueFiles_PreviewMouseRightButtonDown"
+                                  PreviewKeyDown="QueueFiles_PreviewKeyDown"
+                                  MouseDoubleClick="QueueFiles_MouseDoubleClick">
+                            <ListView.ContextMenu>
+                                <ContextMenu Opened="QueueFileMenu_Opened">
+                                    <MenuItem Header="{DynamicResource PauseFile}" Click="QueuePauseFile_Click"/>
+                                    <MenuItem Header="{DynamicResource ResumeFile}" Click="QueueResumeFile_Click"/>
+                                    <MenuItem Tag="RetryFile" Header="{DynamicResource RetryFile}" Click="QueueRetryFile_Click"/>
+                                    <MenuItem Header="{DynamicResource DownloadNext}" Click="QueuePrioritizeFile_Click"/>
+                                    <Separator/>
+                                    <MenuItem Tag="OpenFile" Header="{DynamicResource OpenFile}" Click="QueueOpenFile_Click"/>
+                                    <MenuItem Tag="OpenFolder" Header="{DynamicResource OpenFolder}" Click="QueueOpenFileFolder_Click"/>
+                                    <MenuItem Tag="CopyFileName" Header="{DynamicResource CopyFileName}" Click="QueueCopyFileName_Click"/>
+                                    <Separator/>
+                                    <MenuItem Header="{DynamicResource SelectAll}" Click="QueueSelectAllFiles_Click"/>
+                                    <MenuItem Header="{DynamicResource SelectErrors}" Click="QueueSelectErrorFiles_Click"/>
+                                    <MenuItem Header="{DynamicResource SelectPaused}" Click="QueueSelectPausedFiles_Click"/>
+                                    <MenuItem Header="{DynamicResource ClearSelection}" Click="QueueClearFileSelection_Click"/>
+                                </ContextMenu>
+                            </ListView.ContextMenu>
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="#" DisplayMemberBinding="{Binding Number}" Width="50"/>
+                                    <GridViewColumn Header="{DynamicResource Name}" DisplayMemberBinding="{Binding Title}" Width="320"/>
+                                    <GridViewColumn Header="{DynamicResource FileName}" DisplayMemberBinding="{Binding FileName}" Width="260"/>
+                                    <GridViewColumn Header="{DynamicResource QueueState}" DisplayMemberBinding="{Binding Status}" Width="120"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
                 </Grid>
-            </Controls:MetroTabItem>
+                <TextBlock Grid.Row="5" x:Name="QueueStatusText" Margin="0,8,0,0" Opacity="0.75"/>
+            </Grid>
+        </Controls:MetroTabItem>
 
-        </Controls:MetroAnimatedTabControl>
-    </Grid>
+        <Controls:MetroTabItem Header="{DynamicResource BulkDownload}" x:Name="BulkMetroTabItem">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBox Grid.Row="0" x:Name="BulkLinksTextBox" AcceptsReturn="True" TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto" TextChanged="NyTextBox_TextChanged_1" FontSize="15"
+                         PreviewDrop="NyBulkLinksTextBox_PreviewDrop" MinHeight="160"/>
+                <Button Grid.Row="1" x:Name="BulkDownloadButton" Style="{StaticResource ActionButton}" HorizontalAlignment="Left"
+                        Margin="0,12,0,0" IsEnabled="False" Click="NyBulkDownloadButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconModern Width="16" Height="16" Kind="ArrowDown"/>
+                        <TextBlock Text="{DynamicResource Download}" Margin="8,0,0,0"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Controls:MetroTabItem>
+
+        <Controls:MetroTabItem Header="{DynamicResource Transcode}">
+            <local:TranscodePage/>
+        </Controls:MetroTabItem>
+    </Controls:MetroAnimatedTabControl>
 </UserControl>

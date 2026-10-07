@@ -3,12 +3,13 @@
                     xmlns:s="clr-namespace:System;assembly=mscorlib"
                     xml:space="preserve">
     
-    <s:String x:Key="Title">YouTube Playlist Downloader</s:String>
+    <s:String x:Key="Title">NewYoutubeDownloader</s:String>
     <FlowDirection x:Key="FlowDirection">LeftToRight</FlowDirection>
-    <s:String x:Key="InsertYoutubePlaylistLinkHere">Insert a YouTube link here</s:String>
+    <s:String x:Key="InsertYoutubePlaylistLinkHere">Insert a YouTube, Rutube or VK Video link here</s:String>
     <s:String x:Key="Exit">Exit</s:String>
     <s:String x:Key="ExitMessage">Are you sure you want to exit?</s:String>
     <s:String x:Key="Yes">Yes</s:String>
+    <s:String x:Key="Ok">OK</s:String>
     <s:String x:Key="No">No</s:String>
     <s:String x:Key="Error">Error</s:String>
     <s:String x:Key="ErrorMessage">An unexpected error occurred while performing the action. Please contact your administrator to handle the error.</s:String>
@@ -42,23 +43,16 @@
     <s:String x:Key="Prefer">Prefer videos with a resolution of</s:String>
     <s:String x:Key="AreYouSureExit">Are you sure you want to exit?</s:String>
     <s:String x:Key="TotalVideos">Total videos: </s:String>
-    <s:String x:Key="AboutTheProgram">This program was developed by shaked6540 and it is completely free to use without limitation.
-However, I am not responsible for any legal trouble that this program will cause you, 
-as far as I know, YouTube does not permit downloading videos from their website. 
-The full source code for this program can be found at https://github.com/shaked6540/YoutubePlaylistDownloader
-        
-The installer was made using Inno Setup (http://www.jrsoftware.org/isinfo.php)
-    
+    <s:String x:Key="AboutTheProgram">Downloads videos and playlists from YouTube, Rutube and VK Video.
 
-YouTube Playlist Downloader v</s:String>
+NewYoutubeDownloader v</s:String>
     <s:String x:Key="BitRate">and set the bit rate to</s:String>
     <s:String x:Key="NewVersionAvailable">New version available</s:String>
     <s:String x:Key="DoYouWantToUpdate">A new version is available, do you want to update?
 Here's what's new:</s:String>
     <s:String x:Key="DownloadingUpdateSetup">Currently downloading: Update Setup</s:String>
     <s:String x:Key="UpdateCancelled">Update was cancelled.</s:String>
-    <s:String x:Key="ErrorWhileUpdating">An error has occurred while downloading the update setup, make sure you're connected to the Internet.
-If you are connected to the Internet, try downloading a later time or visit https://github.com/shaked6540/YoutubePlaylistDownloader/issues to see if theres an issue with the download server.</s:String>
+    <s:String x:Key="ErrorWhileUpdating">An error has occurred while downloading the update. Make sure you are connected to the Internet and try again later.</s:String>
     <s:String x:Key="UpdateComplete">Download complete.</s:String>
     <s:String x:Key="UpdateWhenIExit">Update when I exit</s:String>
     <s:String x:Key="UpdateAndExit">Close and update now</s:String>
@@ -100,11 +94,7 @@ All subscriptions are customizable and have their own settings, to access subscr
 Please note that if the program is not running, new videos will not be downloaded.
     </s:String>
     <s:String x:Key="ContactTheDeveloper">Contact</s:String>
-    <s:String x:Key="ContactTheDeveloperHelp">There are several ways to contact me (shaked6540): 
-
-The first one is Reddit, simply send me a message on Reddit and I will respond as soon as I can, this is my profile link: https://www.reddit.com/user/shaked6540/
-
-The second way to contact me is through GitHub, simply open a new issue and I will try to respond as soon as possible, here is a link: https://github.com/shaked6540/YoutubePlaylistDownloader/issues</s:String>
+    <s:String x:Key="ContactTheDeveloperHelp">Open Help from the top of the window for a short guide to downloads, playlists and settings.</s:String>
     <s:String x:Key="AutomaticallyCheckForUpdates">Automatically check for updates when I start the program</s:String>
     <s:String x:Key="WhatsNew">What's new?</s:String>
     <s:String x:Key="SubscriptionsUpdateDelay">Update subscriptions every</s:String>
@@ -181,4 +171,130 @@ Please note that not all the parameters are always available (for example, when 
     <s:String x:Key="CopyToClipboard">Copy to clipboard</s:String>
     <s:String x:Key="SaveToTextFile">Save to text file</s:String>
     <s:String x:Key="VideoLanguage">Video Language: </s:String>
+    <s:String x:Key="YouTubeAccount">YouTube account</s:String>
+    <s:String x:Key="SignInToYouTube">Sign in</s:String>
+    <s:String x:Key="SignOutYouTube">Sign out</s:String>
+    <s:String x:Key="YouTubeSignedIn">Signed in — full quality uses this session</s:String>
+    <s:String x:Key="YouTubeSignedOut">Not signed in</s:String>
+    <s:String x:Key="ImportFirefoxSession">Import Firefox session</s:String>
+    <s:String x:Key="FirefoxCookiesNotFound">Could not import a YouTube login from Firefox.</s:String>
+    <s:String x:Key="SaveYouTubeSession">Save session</s:String>
+    <s:String x:Key="YouTubeLoginHint">Sign in to YouTube, then save the session. Adaptive 1080p uses this login.</s:String>
+    <s:String x:Key="CapturingSession">Saving cookies…</s:String>
+    <s:String x:Key="YouTubeLoginNotDetected">Sign-in was not detected. Open the YouTube homepage after login, then save.</s:String>
+    <s:String x:Key="Cancel">Cancel</s:String>
+    <s:String x:Key="RutubeAccount">Rutube account</s:String>
+    <s:String x:Key="SignInToRutube">Sign in</s:String>
+    <s:String x:Key="SignOutRutube">Sign out</s:String>
+    <s:String x:Key="RutubeSignedIn">Signed in — Rutube downloads use this session</s:String>
+    <s:String x:Key="RutubeSignedOut">Not signed in</s:String>
+    <s:String x:Key="SaveRutubeSession">Save session</s:String>
+    <s:String x:Key="RutubeLoginHint">Sign in to Rutube, then save the session. Private and restricted videos use this login.</s:String>
+    <s:String x:Key="RutubeLoginNotDetected">Sign-in was not detected. Open the Rutube homepage after login, then save.</s:String>
+    <s:String x:Key="FirefoxRutubeCookiesNotFound">Could not import a Rutube login from Firefox.</s:String>
+    <s:String x:Key="FindRelatedPlaylists">Find other playlists</s:String>
+    <s:String x:Key="AddRelatedPlaylistsToBulk">Add to bulk list</s:String>
+    <s:String x:Key="RelatedPlaylistsFound">Found {0} playlist(s)</s:String>
+    <s:String x:Key="RelatedPlaylistsNone">No other playlists found on this page</s:String>
+    <s:String x:Key="RelatedPlaylistsAdded">Added {0} playlist(s) to bulk download</s:String>
+    <s:String x:Key="ChannelPlaylists">Channel playlists</s:String>
+    <s:String x:Key="SimultaneousDownloads">Simultaneous downloads:</s:String>
+    <s:String x:Key="WaitingInQueue">Waiting in queue...</s:String>
+    <s:String x:Key="HelpIntroTitle">Getting started</s:String>
+    <s:String x:Key="HelpIntro">Paste a YouTube, Rutube or VK Video link to a video, playlist or channel. Public content downloads without signing in. For private or restricted videos, sign in under Settings.</s:String>
+    <s:String x:Key="HelpDownloadTitle">Downloading</s:String>
+    <s:String x:Key="HelpDownload">Use Download to watch progress, or Add to queue to run in the background. Back does not cancel a download — the job stays in the queue. Choose a folder, format, quality and file name pattern in Options.</s:String>
+    <s:String x:Key="HelpSourcesTitle">Sources</s:String>
+    <s:String x:Key="HelpSources">YouTube, Rutube and VK Video are supported. Full YouTube quality and restricted Rutube videos use the account session saved in Settings (in-app sign-in or Firefox cookie import).</s:String>
+    <s:String x:Key="HelpPlaylistsTitle">Playlists</s:String>
+    <s:String x:Key="HelpPlaylists">A playlist can be saved in its own folder named after the playlist. Files are numbered in order and an .m3u file is written for sequential playback. You can scan the page for other playlists and add them to bulk download. A channel playlists catalog expands into the list of playlists.</s:String>
+    <s:String x:Key="HelpQueueTitle">Queue and resume</s:String>
+    <s:String x:Key="HelpQueue">The Queue tab lists downloads like a torrent client. Select one or more rows with Ctrl and Shift. Pause, resume, reorder or cancel the selection. The file list shows the focused download. Right-click for the menu. On resume the app checks files already in the folder: a finished file whose duration matches the video is kept, and an incomplete .part is downloaded again. The counter is checked files out of the whole playlist.</s:String>
+    <s:String x:Key="Pause">Pause</s:String>
+    <s:String x:Key="Resume">Resume</s:String>
+    <s:String x:Key="MoveUp">Up</s:String>
+    <s:String x:Key="MoveDown">Down</s:String>
+    <s:String x:Key="MoveToTop">Top</s:String>
+    <s:String x:Key="Paused">Paused</s:String>
+    <s:String x:Key="QueueDetails">Details</s:String>
+    <s:String x:Key="QueueFiles">Files</s:String>
+    <s:String x:Key="QueueName">Name</s:String>
+    <s:String x:Key="QueueState">Status</s:String>
+    <s:String x:Key="FileQueued">Queued</s:String>
+    <s:String x:Key="FileDownloading">Downloading</s:String>
+    <s:String x:Key="FilePaused">Paused</s:String>
+    <s:String x:Key="FileDone">Done</s:String>
+    <s:String x:Key="FileError">Error</s:String>
+    <s:String x:Key="FilePartial">Incomplete</s:String>
+    <s:String x:Key="CheckingFiles">Checking files...</s:String>
+    <s:String x:Key="PauseFile">Pause file</s:String>
+    <s:String x:Key="ResumeFile">Resume file</s:String>
+    <s:String x:Key="Prioritize">Priority</s:String>
+    <s:String x:Key="DestinationFolder">Folder</s:String>
+    <s:String x:Key="CurrentFile">Current file</s:String>
+    <s:String x:Key="FileName">File</s:String>
+    <s:String x:Key="Source">Link</s:String>
+    <s:String x:Key="MoveToBottom">Bottom</s:String>
+    <s:String x:Key="OpenFolder">Open folder</s:String>
+    <s:String x:Key="OpenFile">Open file</s:String>
+    <s:String x:Key="CopyLink">Copy link</s:String>
+    <s:String x:Key="CopyPath">Copy path</s:String>
+    <s:String x:Key="CopyFileName">Copy file name</s:String>
+    <s:String x:Key="SelectAll">Select all</s:String>
+    <s:String x:Key="ClearSelection">Clear selection</s:String>
+    <s:String x:Key="SelectErrors">Select errors</s:String>
+    <s:String x:Key="SelectPaused">Select paused</s:String>
+    <s:String x:Key="RetryFile">Retry</s:String>
+    <s:String x:Key="DownloadNext">Download next</s:String>
+    <s:String x:Key="QueueFilter">Filter by name, folder or link</s:String>
+    <s:String x:Key="QueueSummary">{0} selected, {1} paused, {2} downloading</s:String>
+    <s:String x:Key="QueueNoFiles">Select a download to see its files</s:String>
+    <s:String x:Key="CancelSelectedConfirm">Cancel {0} downloads?</s:String>
+    <s:String x:Key="QueueStatusLine">{0} downloads · {1} selected · {2} MiB/s</s:String>
+    <s:String x:Key="QueueRetryUnavailable">This download has already finished, so the file cannot be retried from the queue.</s:String>
+    <s:String x:Key="HelpSettingsTitle">Settings</s:String>
+    <s:String x:Key="HelpSettings">Theme, language, YouTube and Rutube accounts, and conversion limits. Download options (folder, format, quality) are on the main screen under Options.</s:String>
+    <s:String x:Key="Transcode">Transcode</s:String>
+    <s:String x:Key="TranscodeAddFiles">Add files</s:String>
+    <s:String x:Key="TranscodeAddFolder">Add folder</s:String>
+    <s:String x:Key="TranscodeClear">Clear</s:String>
+    <s:String x:Key="TranscodeSubfolders">Include subfolders</s:String>
+    <s:String x:Key="TranscodeAgain">Transcode again</s:String>
+    <s:String x:Key="TranscodeAsIs">As-is</s:String>
+    <s:String x:Key="TranscodeCompatible">Compatible</s:String>
+    <s:String x:Key="TranscodeSmaller">Smaller</s:String>
+    <s:String x:Key="TranscodeStrong">Strong</s:String>
+    <s:String x:Key="TranscodeStrongNote">Older players may not open HEVC</s:String>
+    <s:String x:Key="TranscodeOpus">Audio only, Opus 64 kbps</s:String>
+    <s:String x:Key="TranscodeMp3">Audio only, MP3 128 kbps</s:String>
+    <s:String x:Key="TranscodeCustom">Custom</s:String>
+    <s:String x:Key="TranscodeDuration">Duration</s:String>
+    <s:String x:Key="TranscodeResolution">Resolution</s:String>
+    <s:String x:Key="TranscodeVideoCodec">Video</s:String>
+    <s:String x:Key="TranscodeAudioCodec">Audio</s:String>
+    <s:String x:Key="TranscodeSize">Size</s:String>
+    <s:String x:Key="TranscodeEstimated">Estimate</s:String>
+    <s:String x:Key="TranscodePercent">Saved</s:String>
+    <s:String x:Key="TranscodeDelta">Difference</s:String>
+    <s:String x:Key="TranscodeStart">Transcode</s:String>
+    <s:String x:Key="TranscodeCancel">Cancel</s:String>
+    <s:String x:Key="TranscodeEstimateHint">The size is an estimate from duration, resolution and quality. The file size after encoding can differ.</s:String>
+    <s:String x:Key="TranscodePickFiles">Add downloaded files or a folder to see size estimates.</s:String>
+    <s:String x:Key="TranscodeReading">Reading</s:String>
+    <s:String x:Key="TranscodeUnavailable">Estimate unavailable</s:String>
+    <s:String x:Key="TranscodeNoVideo">No video in this file</s:String>
+    <s:String x:Key="TranscodeSummary">{0} files, now {1}, estimate {2}, saved {3}</s:String>
+    <s:String x:Key="TranscodeBusyDownload">Still downloading</s:String>
+    <s:String x:Key="TranscodeSkipped">Already transcoded with this preset</s:String>
+    <s:String x:Key="TranscodeWorking">Transcoding</s:String>
+    <s:String x:Key="TranscodeDone">Done</s:String>
+    <s:String x:Key="TranscodeContainer">Container</s:String>
+    <s:String x:Key="TranscodeCodec">Codec</s:String>
+    <s:String x:Key="TranscodeHeight">Height</s:String>
+    <s:String x:Key="TranscodeQuality">Quality (CRF)</s:String>
+    <s:String x:Key="TranscodeAudio">Audio</s:String>
+    <s:String x:Key="TranscodeBitrate">Bitrate</s:String>
+    <s:String x:Key="TranscodeOriginal">Original</s:String>
+    <s:String x:Key="HelpTranscodeTitle">Transcoding</s:String>
+    <s:String x:Key="HelpTranscode">The Transcode tab compresses files that are already downloaded and replaces the original after a successful encode. Pick a preset to see the estimated size and savings. The percent is an estimate, not the exact size after encoding.</s:String>
 </ResourceDictionary> 

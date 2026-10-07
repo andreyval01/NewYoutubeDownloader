@@ -5,19 +5,19 @@
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{444538EE-4F35-4245-AEAE-6C149BB852B8}
-AppName=YouTube Playlist Downloader
-AppVersion=1.9.34
-AppVerName=YouTube Playlist Downloader 1.9.34
-AppPublisher=shaked6540
-AppPublisherURL=https://github.com/shaked6540/YoutubePlaylistDownloader
-AppSupportURL=https://github.com/shaked6540/YoutubePlaylistDownloader
-AppUpdatesURL=https://github.com/shaked6540/YoutubePlaylistDownloader
-DefaultDirName={commonpf}\YouTube Playlist Downloader
-DefaultGroupName=YouTube Playlist Downloader
+AppId={{7C4E1A2B-9D63-4F18-A6E5-2B8C0D4E91F7}
+AppName=NewYoutubeDownloader
+AppVersion=0.1
+AppVerName=NewYoutubeDownloader 0.1
+AppPublisher=NewYoutubeDownloader
+AppPublisherURL=
+AppSupportURL=
+AppUpdatesURL=
+DefaultDirName={commonpf}\NewYoutubeDownloader
+DefaultGroupName=NewYoutubeDownloader
 AllowNoIcons=yes
-OutputDir=D:\Inno output\1.9.34
-OutputBaseFilename=YoutubePlaylistDownloader
+OutputDir=D:\Inno output\0.1
+OutputBaseFilename=NewYoutubeDownloader
 SetupIconFile=..\YoutubePlaylistDownloader\finalIcon.ico
 Compression=lzma
 SolidCompression=yes
@@ -38,9 +38,9 @@ Source: "C:\bin\bin32\ffmpeg.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files        
 
 [Icons]
-Name: "{group}\YouTube Playlist Downloader"; Filename: "{app}\YoutubePlaylistDownloader.exe"
-Name: "{commondesktop}\YouTube Playlist Downloader"; Filename: "{app}\YoutubePlaylistDownloader.exe"; Tasks: desktopicon
+Name: "{group}\NewYoutubeDownloader"; Filename: "{app}\NewYoutubeDownloader.exe"
+Name: "{commondesktop}\NewYoutubeDownloader"; Filename: "{app}\NewYoutubeDownloader.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\YoutubePlaylistDownloader.exe"; Description: "{cm:LaunchProgram,YouTube Playlist Downloader}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\NewYoutubeDownloader.exe"; Description: "{cm:LaunchProgram,NewYoutubeDownloader}"; Flags: nowait postinstall skipifsilent
 

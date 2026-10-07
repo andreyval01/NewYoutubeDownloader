@@ -2,7 +2,7 @@
 
 public static class ExtensionMethods
 {
-    public static async Task WhenAll(params ValueTask[] tasks)
+    public static async Task NyWhenAll(params ValueTask[] tasks)
     {
         var toAwait = new List<Task>();
 

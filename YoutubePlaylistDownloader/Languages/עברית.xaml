@@ -3,10 +3,10 @@
                     xmlns:s="clr-namespace:System;assembly=mscorlib"
                     xml:space="preserve">
     
-    <s:String x:Key="Title">הורדת פליילסט מיוטיוב</s:String>
+    <s:String x:Key="Title">NewYoutubeDownloader</s:String>
     <FlowDirection x:Key="FlowDirection">RightToLeft</FlowDirection>
     <FlowDirection x:Key="Skipping">הקובץ כבר קיים, דלג ...</FlowDirection>
-    <s:String x:Key="InsertYoutubePlaylistLinkHere">הכנס קישור פלייליסט כאן</s:String>
+    <s:String x:Key="InsertYoutubePlaylistLinkHere">הכנס קישור YouTube, Rutube או VK Video כאן</s:String>
     <s:String x:Key="Exit">יציאה</s:String>
     <s:String x:Key="ExitMessage">האם אתה בטוח שאתה רוצה לצאת?</s:String>
     <s:String x:Key="Yes">כן</s:String>
@@ -42,15 +42,9 @@
     <s:String x:Key="Prefer">העדף סרטונים ברזולוציה </s:String>
     <s:String x:Key="AreYouSureExit">האם אתה בטוח שברצונך לצאת?</s:String>
     <s:String x:Key="TotalVideos">כמות סרטונים: </s:String>
-    <s:String x:Key="AboutTheProgram">תוכנית זו פותחה על ידי shaked6540 והיא חופשית לחלוטין לשימוש ללא הגבלה.
-עם זאת, אינני אחראי לכל בעיה משפטית שתכנית זו תגרום לך,
-עד כמה שידוע לי, YouTube אינו מתיר הורדת סרטונים מהאתר שלהם. 
-קוד המקור המלא של התכונה זמין בלינק הבא: https://github.com/shaked6540/YoutubePlaylistDownloader
-    
-ההתקנה נוצרה בעזרת Inno Setup (http://www.jrsoftware.org/isinfo.php)
+    <s:String x:Key="AboutTheProgram">הורדת סרטונים ופלייליסטים מ-YouTube, Rutube ו-VK Video.
 
-
-YouTube Playlist Downloader v</s:String>
+NewYoutubeDownloader v</s:String>
     <s:String x:Key="SaveAndBackToDownload">שמור וחזור לתפריט הראשי</s:String>
     <s:String x:Key="BitRate">קבע את קצב הביטים ל</s:String>
         <s:String x:Key="NewVersionAvailable">גרסה חדשה זמינה</s:String>
@@ -59,7 +53,7 @@ YouTube Playlist Downloader v</s:String>
     <s:String x:Key="DownloadingUpdateSetup">כרגע מוריד: Update Setup</s:String>
     <s:String x:Key="UpdateCancelled">העדכון בוטל.</s:String>
     <s:String x:Key="ErrorWhileUpdating">אירעה שגיאה בעת הורדת קובץ העדכון, וודא כי אתה מחובר לאינטרנט
-אם אתה מחובר לאינטרנט, נסה שוב מאוחר יותר או בדוק באתר https://github.com/shaked6540/YoutubePlaylistDownloader/issues כדי לבדוק אם יש תקלות בשרת ההורדה</s:String>
+אם אתה מחובר לאינטרנט, נסה שוב מאוחר יותר או בדוק באתר  כדי לבדוק אם יש תקלות בשרת ההורדה</s:String>
     <s:String x:Key="UpdateComplete">ההורדה הושלמה</s:String>
     <s:String x:Key="UpdateWhenIExit">עדכן אחרי שאני יוצא</s:String>
     <s:String x:Key="UpdateAndExit">סגור את התוכנה ועדכן עכשיו</s:String>
@@ -100,11 +94,7 @@ YouTube Playlist Downloader v</s:String>
 שים לב שאם התוכנית אינה פועלת, לא יורדו סרטונים חדשים
     </s:String>
     <s:String x:Key="ContactTheDeveloper">צור קשר</s:String>
-    <s:String x:Key="ContactTheDeveloperHelp">ישנן מספר דרכים ליצור עמנו קשר (shaked6540):
-        
-הראשונה היא Reddit, פשוט לשלוח לי הודעה ב Reddit ואני יגיב ברגע שאני יכול, זה קישור הפרופיל שלי: https://www.reddit.com/user/shaked6540/
-        
-הדרך השלישית ליצור איתי קשר היא באמצעות GitHub, פשוט לפתוח בעיה חדשה ואני אנסה להגיב בהקדם האפשרי, הנה קישור: https://github.com/shaked6540/YoutubePlaylistDownloader/issues</s:String>
+    <s:String x:Key="ContactTheDeveloperHelp">פתחו עזרה בראש החלון למדריך קצר על הורדות, פלייליסטים והגדרות.</s:String>
     <s:String x:Key="AutomaticallyCheckForUpdates">חפש אוטומטית עדכונים כאשר אני מפעיל את התוכנית</s:String>
     <s:String x:Key="WhatsNew">מה חדש?</s:String>
     <s:String x:Key="SubscriptionsUpdateDelay">עדכן הרשמות כל</s:String>
@@ -179,4 +169,86 @@ Please note that not all the parameters are always available (for example, when 
     <s:String x:Key="CopyToClipboard">העתק</s:String>
     <s:String x:Key="SaveToTextFile">שמור לקובץ</s:String>
     <s:String x:Key="VideoLanguage">שפת הסרטון: </s:String>
+    <s:String x:Key="YouTubeAccount">YouTube account</s:String>
+    <s:String x:Key="SignInToYouTube">Sign in</s:String>
+    <s:String x:Key="SignOutYouTube">Sign out</s:String>
+    <s:String x:Key="YouTubeSignedIn">Signed in — full quality uses this session</s:String>
+    <s:String x:Key="YouTubeSignedOut">Not signed in</s:String>
+    <s:String x:Key="ImportFirefoxSession">Import Firefox session</s:String>
+    <s:String x:Key="FirefoxCookiesNotFound">Could not import a YouTube login from Firefox.</s:String>
+    <s:String x:Key="SaveYouTubeSession">Save session</s:String>
+    <s:String x:Key="YouTubeLoginHint">Sign in to YouTube, then save the session. Adaptive 1080p uses this login.</s:String>
+    <s:String x:Key="CapturingSession">Saving cookies…</s:String>
+    <s:String x:Key="YouTubeLoginNotDetected">Sign-in was not detected. Open the YouTube homepage after login, then save.</s:String>
+    <s:String x:Key="Cancel">Cancel</s:String>
+    <s:String x:Key="RutubeAccount">Rutube account</s:String>
+    <s:String x:Key="SignInToRutube">Sign in</s:String>
+    <s:String x:Key="SignOutRutube">Sign out</s:String>
+    <s:String x:Key="RutubeSignedIn">Signed in — Rutube downloads use this session</s:String>
+    <s:String x:Key="RutubeSignedOut">Not signed in</s:String>
+    <s:String x:Key="SaveRutubeSession">Save session</s:String>
+    <s:String x:Key="RutubeLoginHint">Sign in to Rutube, then save the session. Private and restricted videos use this login.</s:String>
+    <s:String x:Key="RutubeLoginNotDetected">Sign-in was not detected. Open the Rutube homepage after login, then save.</s:String>
+    <s:String x:Key="FirefoxRutubeCookiesNotFound">Could not import a Rutube login from Firefox.</s:String>
+    <s:String x:Key="FindRelatedPlaylists">Find other playlists</s:String>
+    <s:String x:Key="AddRelatedPlaylistsToBulk">Add to bulk list</s:String>
+    <s:String x:Key="RelatedPlaylistsFound">Found {0} playlist(s)</s:String>
+    <s:String x:Key="RelatedPlaylistsNone">No other playlists found on this page</s:String>
+    <s:String x:Key="RelatedPlaylistsAdded">Added {0} playlist(s) to bulk download</s:String>
+    <s:String x:Key="ChannelPlaylists">Channel playlists</s:String>
+    <s:String x:Key="SimultaneousDownloads">Simultaneous downloads:</s:String>
+    <s:String x:Key="WaitingInQueue">Waiting in queue...</s:String>
+    <s:String x:Key="HelpIntroTitle">Getting started</s:String>
+    <s:String x:Key="HelpIntro">Paste a YouTube, Rutube or VK Video link to a video, playlist or channel. Public content downloads without signing in. For private or restricted videos, sign in under Settings.</s:String>
+    <s:String x:Key="HelpDownloadTitle">Downloading</s:String>
+    <s:String x:Key="HelpDownload">Use Download to watch progress, or Add to queue to run in the background. Back does not cancel a download — the job stays in the queue. Choose a folder, format, quality and file name pattern in Options.</s:String>
+    <s:String x:Key="HelpSourcesTitle">Sources</s:String>
+    <s:String x:Key="HelpSources">YouTube, Rutube and VK Video are supported. Full YouTube quality and restricted Rutube videos use the account session saved in Settings (in-app sign-in or Firefox cookie import).</s:String>
+    <s:String x:Key="HelpPlaylistsTitle">Playlists</s:String>
+    <s:String x:Key="HelpPlaylists">A playlist can be saved in its own folder named after the playlist. Files are numbered in order and an .m3u file is written for sequential playback. You can scan the page for other playlists and add them to bulk download. A channel playlists catalog expands into the list of playlists.</s:String>
+    <s:String x:Key="HelpQueueTitle">Queue and resume</s:String>
+    <s:String x:Key="HelpQueue">The Queue tab shows active jobs. Only a limited number of downloads run at once (2 by default). Unfinished jobs are saved and continue after you restart the app.</s:String>
+    <s:String x:Key="HelpSettingsTitle">Settings</s:String>
+    <s:String x:Key="HelpSettings">Theme, language, YouTube and Rutube accounts, and conversion limits. Download options (folder, format, quality) are on the main screen under Options.</s:String>
+    <s:String x:Key="Pause">Pause</s:String>
+    <s:String x:Key="Resume">Resume</s:String>
+    <s:String x:Key="MoveUp">Up</s:String>
+    <s:String x:Key="MoveDown">Down</s:String>
+    <s:String x:Key="MoveToTop">Top</s:String>
+    <s:String x:Key="Paused">Paused</s:String>
+    <s:String x:Key="QueueDetails">Details</s:String>
+    <s:String x:Key="QueueFiles">Files</s:String>
+    <s:String x:Key="QueueName">Name</s:String>
+    <s:String x:Key="QueueState">Status</s:String>
+    <s:String x:Key="FileQueued">Queued</s:String>
+    <s:String x:Key="FileDownloading">Downloading</s:String>
+    <s:String x:Key="FilePaused">Paused</s:String>
+    <s:String x:Key="FileDone">Done</s:String>
+    <s:String x:Key="FileError">Error</s:String>
+    <s:String x:Key="PauseFile">Pause file</s:String>
+    <s:String x:Key="ResumeFile">Resume file</s:String>
+    <s:String x:Key="Prioritize">Priority</s:String>
+    <s:String x:Key="DestinationFolder">Folder</s:String>
+    <s:String x:Key="CurrentFile">Current file</s:String>
+    <s:String x:Key="FileName">File</s:String>
+    <s:String x:Key="Source">Link</s:String>
+
+    <s:String x:Key="MoveToBottom">Bottom</s:String>
+    <s:String x:Key="OpenFolder">Open folder</s:String>
+    <s:String x:Key="OpenFile">Open file</s:String>
+    <s:String x:Key="CopyLink">Copy link</s:String>
+    <s:String x:Key="CopyPath">Copy path</s:String>
+    <s:String x:Key="CopyFileName">Copy file name</s:String>
+    <s:String x:Key="SelectAll">Select all</s:String>
+    <s:String x:Key="ClearSelection">Clear selection</s:String>
+    <s:String x:Key="SelectErrors">Select errors</s:String>
+    <s:String x:Key="SelectPaused">Select paused</s:String>
+    <s:String x:Key="RetryFile">Retry</s:String>
+    <s:String x:Key="DownloadNext">Download next</s:String>
+    <s:String x:Key="QueueFilter">Filter by name, folder or link</s:String>
+    <s:String x:Key="QueueSummary">{0} selected, {1} paused, {2} downloading</s:String>
+    <s:String x:Key="QueueNoFiles">Select a download to see its files</s:String>
+    <s:String x:Key="CancelSelectedConfirm">Cancel {0} downloads?</s:String>
+    <s:String x:Key="QueueStatusLine">{0} downloads · {1} selected · {2} MiB/s</s:String>
+    <s:String x:Key="QueueRetryUnavailable">This download has already finished, so the file cannot be retried from the queue.</s:String>
 </ResourceDictionary>

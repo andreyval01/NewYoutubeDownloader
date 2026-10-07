@@ -64,60 +64,62 @@ public partial class DownloadSettingsControl : UserControl
         FilterByLengthTextBox.Text = settings.FilterByLengthValue.ToString();
         FileNamePattenTextBox.Text = settings.FilenamePattern;
         SkipExistingCheckbox.IsChecked = settings.SkipExisting;
+        SimultaneousDownloadsTextBox.Text = DownloadSettings.NormalizeSimultaneousDownloads(settings.MaxSimultaneousDownloads).ToString();
         VideoLanguagesComboBox.SelectedItem = VideoLanguages[settings.VideoLanguage ?? "default"];
 
-        SubscribeToEvents();
+        NySubscribeToEvents();
 
     }
 
-    private void SubscribeToEvents()
+    private void NySubscribeToEvents()
     {
-        PreferCheckBox.Checked += PreferCheckBox_Checked;
-        PreferCheckBox.Unchecked += PreferCheckBox_Unchecked;
-        ResulotionDropDown.SelectionChanged += ResulotionDropDown_SelectionChanged;
-        PreferHighestFPSCheckBox.Checked += PreferHighestFPSCheckBox_Checked;
-        PreferHighestFPSCheckBox.Unchecked += PreferHighestFPSCheckBox_Unchecked;
-        CaptionsCheckBox.Checked += CaptionsCheckBox_Checked;
-        CaptionsCheckBox.Unchecked += CaptionsCheckBox_Unchecked;
-        CaptionsLanguagesComboBox.SelectionChanged += CaptionsLanguagesComboBox_SelectionChanged;
-        ConvertCheckBox.Checked += ConvertCheckBox_Checked;
-        ConvertCheckBox.Unchecked += ConvertCheckBox_Unchecked;
-        ExtensionsDropDown.SelectionChanged += ExtensionsDropDown_SelectionChanged;
-        SaveVideosFormatDropDown.SelectionChanged += VideoExtensionsDropDown_SelectionChanged;
-        BitrateCheckBox.Checked += BitrateCheckBox_Checked;
-        BitrateCheckBox.Unchecked += BitrateCheckBox_Unchecked;
-        BitRateTextBox.TextChanged += BitRateTextBox_TextChanged;
-        AudioOnlyCheckBox.Checked += AudioOnlyCheckBox_Checked;
-        AudioOnlyCheckBox.Unchecked += AudioOnlyCheckBox_Unchecked;
-        UniquePlaylistDirectoryCheckBox.Checked += UniquePlaylistDirectoryCheckBox_Checked;
-        UniquePlaylistDirectoryCheckBox.Unchecked += UniquePlaylistDirectoryCheckBox_Unchecked;
-        PlaylistIndexCheckBox.Checked += PlaylistIndexCheckBox_Checked;
-        PlaylistIndexCheckBox.Unchecked += PlaylistIndexCheckBox_Unchecked;
-        PlaylistStartIndexTextBox.TextChanged += PlaylistStartIndexTextBox_TextChanged;
-        PlaylistEndIndexTextBox.TextChanged += PlaylistEndIndexTextBox_TextChanged;
-        OpenDestinationFolderCheckBox.Checked += OpenDestinationFolderCheckBox_Checked;
-        OpenDestinationFolderCheckBox.Unchecked += OpenDestinationFolderCheckBox_Unchecked;
-        TagAudioFileCheckBox.Checked += TagAudioFileCheckBox_Checked;
-        TagAudioFileCheckBox.Unchecked += TagAudioFileCheckBox_Unchecked;
-        FilterByLengthCheckBox.Checked += FilterByLengthCheckBox_Checked;
-        FilterByLengthCheckBox.Unchecked += FilterByLengthCheckBox_Checked;
-        FilterByLengthShorterOrLongerDropDown.SelectionChanged += FilterByLengthShorterOrLongerDropDown_SelectionChanged;
-        FilterByLengthTextBox.TextChanged += FilterByLengthTextBox_TextChanged;
-        SkipExistingCheckbox.Checked += SkipExistingCheckBox_Checked;
-        SkipExistingCheckbox.Unchecked += SkipExistingCheckBox_Unchecked;
-        VideoLanguagesComboBox.SelectionChanged += VideoLanguagesComboBox_SelectionChanged;
+        PreferCheckBox.Checked += NyPreferCheckBox_Checked;
+        PreferCheckBox.Unchecked += NyPreferCheckBox_Unchecked;
+        ResulotionDropDown.SelectionChanged += NyResulotionDropDown_SelectionChanged;
+        PreferHighestFPSCheckBox.Checked += NyPreferHighestFPSCheckBox_Checked;
+        PreferHighestFPSCheckBox.Unchecked += NyPreferHighestFPSCheckBox_Unchecked;
+        CaptionsCheckBox.Checked += NyCaptionsCheckBox_Checked;
+        CaptionsCheckBox.Unchecked += NyCaptionsCheckBox_Unchecked;
+        CaptionsLanguagesComboBox.SelectionChanged += NyCaptionsLanguagesComboBox_SelectionChanged;
+        ConvertCheckBox.Checked += NyConvertCheckBox_Checked;
+        ConvertCheckBox.Unchecked += NyConvertCheckBox_Unchecked;
+        ExtensionsDropDown.SelectionChanged += NyExtensionsDropDown_SelectionChanged;
+        SaveVideosFormatDropDown.SelectionChanged += NyVideoExtensionsDropDown_SelectionChanged;
+        BitrateCheckBox.Checked += NyBitrateCheckBox_Checked;
+        BitrateCheckBox.Unchecked += NyBitrateCheckBox_Unchecked;
+        BitRateTextBox.TextChanged += NyBitRateTextBox_TextChanged;
+        AudioOnlyCheckBox.Checked += NyAudioOnlyCheckBox_Checked;
+        AudioOnlyCheckBox.Unchecked += NyAudioOnlyCheckBox_Unchecked;
+        UniquePlaylistDirectoryCheckBox.Checked += NyUniquePlaylistDirectoryCheckBox_Checked;
+        UniquePlaylistDirectoryCheckBox.Unchecked += NyUniquePlaylistDirectoryCheckBox_Unchecked;
+        PlaylistIndexCheckBox.Checked += NyPlaylistIndexCheckBox_Checked;
+        PlaylistIndexCheckBox.Unchecked += NyPlaylistIndexCheckBox_Unchecked;
+        PlaylistStartIndexTextBox.TextChanged += NyPlaylistStartIndexTextBox_TextChanged;
+        PlaylistEndIndexTextBox.TextChanged += NyPlaylistEndIndexTextBox_TextChanged;
+        OpenDestinationFolderCheckBox.Checked += NyOpenDestinationFolderCheckBox_Checked;
+        OpenDestinationFolderCheckBox.Unchecked += NyOpenDestinationFolderCheckBox_Unchecked;
+        TagAudioFileCheckBox.Checked += NyTagAudioFileCheckBox_Checked;
+        TagAudioFileCheckBox.Unchecked += NyTagAudioFileCheckBox_Unchecked;
+        FilterByLengthCheckBox.Checked += NyFilterByLengthCheckBox_Checked;
+        FilterByLengthCheckBox.Unchecked += NyFilterByLengthCheckBox_Checked;
+        FilterByLengthShorterOrLongerDropDown.SelectionChanged += NyFilterByLengthShorterOrLongerDropDown_SelectionChanged;
+        FilterByLengthTextBox.TextChanged += NyFilterByLengthTextBox_TextChanged;
+        SkipExistingCheckbox.Checked += NySkipExistingCheckBox_Checked;
+        SkipExistingCheckbox.Unchecked += NySkipExistingCheckBox_Unchecked;
+        SimultaneousDownloadsTextBox.TextChanged += SimultaneousDownloadsTextBox_TextChanged;
+        VideoLanguagesComboBox.SelectionChanged += NyVideoLanguagesComboBox_SelectionChanged;
     }
 
-    private void VideoLanguagesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void NyVideoLanguagesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.VideoLanguage = VideoLanguages.FirstOrDefault(x => x.Value.Equals((string)VideoLanguagesComboBox.SelectedItem, StringComparison.OrdinalIgnoreCase)).Key;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void FilterByLengthTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private void NyFilterByLengthTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (!double.TryParse(FilterByLengthTextBox.Text, out var value))
         {
@@ -128,7 +130,7 @@ public partial class DownloadSettingsControl : UserControl
             {
                 GlobalConsts.DownloadSettings.FilterByLengthValue = 4;
                 GlobalConsts.DownloadSettings.FilterVideosByLength = false;
-                GlobalConsts.SaveDownloadSettings();
+                GlobalConsts.NySaveDownloadSettings();
             }
         }
         else
@@ -137,66 +139,66 @@ public partial class DownloadSettingsControl : UserControl
             if (GlobalConsts.settings.SaveDownloadOptions)
             {
                 GlobalConsts.DownloadSettings.FilterByLengthValue = value;
-                GlobalConsts.SaveDownloadSettings();
+                GlobalConsts.NySaveDownloadSettings();
             }
         }
     }
 
-    private void FilterByLengthShorterOrLongerDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void NyFilterByLengthShorterOrLongerDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.FilterMode = FilterByLengthShorterOrLongerDropDown.SelectedItem.Equals(FindResource("Longer"));
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void FilterByLengthCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyFilterByLengthCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.FilterVideosByLength = FilterByLengthCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void TagAudioFileCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyTagAudioFileCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.TagAudioFile = TagAudioFileCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void TagAudioFileCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyTagAudioFileCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.TagAudioFile = TagAudioFileCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void OpenDestinationFolderCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyOpenDestinationFolderCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.OpenDestinationFolderWhenDone = OpenDestinationFolderCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void OpenDestinationFolderCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyOpenDestinationFolderCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.OpenDestinationFolderWhenDone = OpenDestinationFolderCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void PlaylistEndIndexTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private void NyPlaylistEndIndexTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (!int.TryParse(PlaylistEndIndexTextBox.Text, out var endIndex))
         {
@@ -206,7 +208,7 @@ public partial class DownloadSettingsControl : UserControl
             if (GlobalConsts.settings.SaveDownloadOptions)
             {
                 GlobalConsts.DownloadSettings.SubsetStartIndex = 0;
-                GlobalConsts.SaveDownloadSettings();
+                GlobalConsts.NySaveDownloadSettings();
             }
         }
         else
@@ -215,12 +217,12 @@ public partial class DownloadSettingsControl : UserControl
             if (GlobalConsts.settings.SaveDownloadOptions)
             {
                 GlobalConsts.DownloadSettings.SubsetEndIndex = endIndex;
-                GlobalConsts.SaveDownloadSettings();
+                GlobalConsts.NySaveDownloadSettings();
             }
         }
     }
 
-    private void PlaylistStartIndexTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private void NyPlaylistStartIndexTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (!int.TryParse(PlaylistStartIndexTextBox.Text, out var startIndex) || startIndex < 1)
         {
@@ -228,7 +230,7 @@ public partial class DownloadSettingsControl : UserControl
             if (GlobalConsts.settings.SaveDownloadOptions)
             {
                 GlobalConsts.DownloadSettings.SubsetStartIndex = 0;
-                GlobalConsts.SaveDownloadSettings();
+                GlobalConsts.NySaveDownloadSettings();
             }
         }
         else
@@ -237,66 +239,62 @@ public partial class DownloadSettingsControl : UserControl
             if (GlobalConsts.settings.SaveDownloadOptions)
             {
                 GlobalConsts.DownloadSettings.SubsetStartIndex = startIndex - 1;
-                GlobalConsts.SaveDownloadSettings();
+                GlobalConsts.NySaveDownloadSettings();
             }
         }
     }
 
-    private void PlaylistIndexCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyPlaylistIndexCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.Subset = PlaylistIndexCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void PlaylistIndexCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyPlaylistIndexCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.Subset = PlaylistIndexCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void UniquePlaylistDirectoryCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyUniquePlaylistDirectoryCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
+        GlobalConsts.DownloadSettings.SavePlaylistsInDifferentDirectories = UniquePlaylistDirectoryCheckBox.IsChecked.Value;
         if (GlobalConsts.settings.SaveDownloadOptions)
-        {
-            GlobalConsts.DownloadSettings.SavePlaylistsInDifferentDirectories = UniquePlaylistDirectoryCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
-        }
+            GlobalConsts.NySaveDownloadSettings();
     }
 
-    private void UniquePlaylistDirectoryCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyUniquePlaylistDirectoryCheckBox_Checked(object sender, RoutedEventArgs e)
     {
+        GlobalConsts.DownloadSettings.SavePlaylistsInDifferentDirectories = UniquePlaylistDirectoryCheckBox.IsChecked.Value;
         if (GlobalConsts.settings.SaveDownloadOptions)
-        {
-            GlobalConsts.DownloadSettings.SavePlaylistsInDifferentDirectories = UniquePlaylistDirectoryCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
-        }
+            GlobalConsts.NySaveDownloadSettings();
     }
 
-    private void CaptionsCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyCaptionsCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.DownloadCaptions = CaptionsCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void CaptionsCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyCaptionsCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.DownloadCaptions = CaptionsCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void CaptionsLanguagesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void NyCaptionsLanguagesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
@@ -305,140 +303,140 @@ public partial class DownloadSettingsControl : UserControl
             if (CaptionsCheckBox.IsChecked.Value && GlobalConsts.DownloadSettings.CaptionsLanguage == default)
                 GlobalConsts.DownloadSettings.CaptionsLanguage = "en";
 
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void PreferCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyPreferCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.PreferQuality = PreferCheckBox.IsChecked.Value;
             GlobalConsts.DownloadSettings.Quality = Resolutions1[(string)ResulotionDropDown.SelectedValue];
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void PreferCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyPreferCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.PreferQuality = PreferCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void ResulotionDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void NyResulotionDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.Quality = Resolutions1[(string)ResulotionDropDown.SelectedValue];
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void ConvertCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyConvertCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.Convert = ConvertCheckBox.IsChecked.Value;
             GlobalConsts.DownloadSettings.SaveFormat = (string)ExtensionsDropDown.SelectedItem;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void ConvertCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyConvertCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.Convert = ConvertCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void ExtensionsDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void NyExtensionsDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.SaveFormat = (string)ExtensionsDropDown.SelectedItem;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void VideoExtensionsDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void NyVideoExtensionsDropDown_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.VideoSaveFormat = (string)SaveVideosFormatDropDown.SelectedItem;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void BitrateCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyBitrateCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.SetBitrate = BitrateCheckBox.IsChecked.Value;
             GlobalConsts.DownloadSettings.Bitrate = BitRateTextBox.Text;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void BitrateCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyBitrateCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.SetBitrate = BitrateCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void BitRateTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private void NyBitRateTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.Bitrate = BitRateTextBox.Text;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void PreferHighestFPSCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyPreferHighestFPSCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.PreferHighestFPS = PreferHighestFPSCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void PreferHighestFPSCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyPreferHighestFPSCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.PreferHighestFPS = PreferHighestFPSCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void AudioOnlyCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NyAudioOnlyCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.AudioOnly = AudioOnlyCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void AudioOnlyCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NyAudioOnlyCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.AudioOnly = AudioOnlyCheckBox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void TextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private void NyTextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         using var dialog = new FolderBrowserDialog();
         dialog.RootFolder = Environment.SpecialFolder.Desktop;
@@ -447,17 +445,17 @@ public partial class DownloadSettingsControl : UserControl
         {
             SaveDirectoryTextBox.Text = dialog.SelectedPath;
             GlobalConsts.settings.SaveDirectory = SaveDirectoryTextBox.Text;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void SaveDirectoryTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private void NySaveDirectoryTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         var dir = SaveDirectoryTextBox.Text;
         if (Directory.Exists(dir))
         {
             GlobalConsts.settings.SaveDirectory = dir;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
             SaveDirectoryTextBox.Background = null;
         }
         else
@@ -465,40 +463,50 @@ public partial class DownloadSettingsControl : UserControl
 
     }
 
-    private void Tile_Click(object sender, RoutedEventArgs e)
+    private void NyTile_Click(object sender, RoutedEventArgs e)
     {
-        TextBox_MouseDoubleClick(sender, null);
+        NyTextBox_MouseDoubleClick(sender, null);
     }
 
-    private void RestPatternToDefault_Click(object sender, RoutedEventArgs e)
+    private void NyRestPatternToDefault_Click(object sender, RoutedEventArgs e)
     {
         GlobalConsts.DownloadSettings.FilenamePattern = "$title";
         FileNamePattenTextBox.Text = GlobalConsts.DownloadSettings.FilenamePattern;
-        GlobalConsts.SaveDownloadSettings();
+        GlobalConsts.NySaveDownloadSettings();
     }
 
-    private void FileNamePattenTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private void NyFileNamePattenTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         GlobalConsts.DownloadSettings.FilenamePattern = FileNamePattenTextBox.Text;
-        GlobalConsts.SaveDownloadSettings();
+        GlobalConsts.NySaveDownloadSettings();
     }
 
-    private void SkipExistingCheckBox_Checked(object sender, RoutedEventArgs e)
+    private void NySkipExistingCheckBox_Checked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.SkipExisting = SkipExistingCheckbox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
     }
 
-    private void SkipExistingCheckBox_Unchecked(object sender, RoutedEventArgs e)
+    private void NySkipExistingCheckBox_Unchecked(object sender, RoutedEventArgs e)
     {
         if (GlobalConsts.settings.SaveDownloadOptions)
         {
             GlobalConsts.DownloadSettings.SkipExisting = SkipExistingCheckbox.IsChecked.Value;
-            GlobalConsts.SaveDownloadSettings();
+            GlobalConsts.NySaveDownloadSettings();
         }
+    }
+
+    private void SimultaneousDownloadsTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (!int.TryParse(SimultaneousDownloadsTextBox.Text, out var value))
+            return;
+        var limit = DownloadSettings.NormalizeSimultaneousDownloads(value);
+        GlobalConsts.DownloadSettings.MaxSimultaneousDownloads = limit;
+        DownloadGate.Limit = limit;
+        GlobalConsts.NySaveDownloadSettings();
     }
 
 }

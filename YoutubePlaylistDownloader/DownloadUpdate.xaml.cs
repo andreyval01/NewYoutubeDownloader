@@ -86,16 +86,16 @@ public partial class DownloadUpdate : UserControl, IDownload
         InitializeComponent();
         if (!updateLater)
         {
-            GlobalConsts.HideSettingsButton();
-            GlobalConsts.HideAboutButton();
-            GlobalConsts.HideHomeButton();
-            GlobalConsts.HideHelpButton();
+            GlobalConsts.NyHideSettingsButton();
+            GlobalConsts.NyHideAboutButton();
+            GlobalConsts.NyHideHomeButton();
+            GlobalConsts.NyHideHelpButton();
         }
         ChangelogRun.Text = changelog;
         downloadFinished = false;
         GlobalConsts.UpdateSetupLocation = $"{GlobalConsts.TempFolderPath}Setup {latestVersion}.exe";
 
-        ImageUrl = $"https://raw.githubusercontent.com/shaked6540/YoutubePlaylistDownloader/master/YoutubePlaylistDownloader/finalIcon.ico";
+        ImageUrl = string.Empty;
         Title = $"{FindResource("DownloadingUpdateSetup")}";
         CurrentStatus = (string)FindResource("Loading");
         TotalDownloaded = $"(0/1)";
@@ -105,29 +105,18 @@ public partial class DownloadUpdate : UserControl, IDownload
         httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue() { NoCache = true };
         cancellationTokenSource = new CancellationTokenSource();
 
-        StartUpdate().ConfigureAwait(false);
+        NyStartUpdate().ConfigureAwait(false);
 
         GlobalConsts.Downloads.Add(new QueuedDownload(this));
     }
 
-    private async Task StartUpdate()
+    private async Task NyStartUpdate()
     {
         await Dispatcher.InvokeAsync(() => HeadlineTextBlock.Text = $"{FindResource("DownloadingUpdateSetup")}");
-        using var fs = new ProgressStream(new FileStream(GlobalConsts.UpdateSetupLocation, FileMode.Create));
-        fs.BytesWritten += DownloadProgressChanged;
-        var latestVersionLink = await httpClient.GetAsync("https://raw.githubusercontent.com/shaked6540/YoutubePlaylistDownloader/master/YoutubePlaylistDownloader/latestVersionLink.txt").ConfigureAwait(false);
-        var response = await httpClient.GetAsync(await latestVersionLink.Content.ReadAsStringAsync().ConfigureAwait(false)).ConfigureAwait(false);
-        await Dispatcher.InvokeAsync(() => CurrentDownloadProgressBar.Maximum = response.Content.Headers.ContentLength ?? 0);
-        await response.Content.CopyToAsync(fs, cancellationTokenSource.Token).ContinueWith(async a =>
-        {
-            if (GlobalConsts.UpdateLater)
-                await DownloadCompletedLater(this, new AsyncCompletedEventArgs(null, a.IsCanceled, null));
-            else
-                await DownloadFileCompleted(this, new AsyncCompletedEventArgs(null, a.IsCanceled, null));
-        });
+        await NyDownloadFileCompleted(this, new AsyncCompletedEventArgs(new InvalidOperationException((string)FindResource("CannotUpdate")), false, null));
     }
 
-    private async void DownloadProgressChanged(object sender, ProgressStreamReportEventArgs args)
+    private async void NyDownloadProgressChanged(object sender, ProgressStreamReportEventArgs args)
     {
         await Dispatcher.InvokeAsync(() =>
         {
@@ -136,7 +125,7 @@ public partial class DownloadUpdate : UserControl, IDownload
         });
     }
 
-    private async Task DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+    private async Task NyDownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
     {
         if (e.Cancelled)
         {
@@ -156,7 +145,7 @@ public partial class DownloadUpdate : UserControl, IDownload
                 CurrentDownloadGrid.Visibility = Visibility.Collapsed;
                 HeadlineTextBlock.Text = error;
             });
-            await GlobalConsts.ShowMessage($"{FindResource($"Error")}", $"{FindResource("ErrorWhileUpdating")}");
+            await GlobalConsts.NyShowMessage($"{FindResource($"Error")}", $"{FindResource("ErrorWhileUpdating")}");
         }
         else
         {
@@ -174,7 +163,7 @@ public partial class DownloadUpdate : UserControl, IDownload
         }
     }
 
-    private void Exit_Click(object sender, RoutedEventArgs e)
+    private void NyExit_Click(object sender, RoutedEventArgs e)
     {
         if (downloadFinished)
         {
@@ -194,20 +183,20 @@ public partial class DownloadUpdate : UserControl, IDownload
             }
             finally
             {
-                GlobalConsts.LoadPage(GlobalConsts.MainPage.Load());
+                GlobalConsts.NyLoadPage(GlobalConsts.MainPage.NyLoad());
             }
         }
     }
 
-    private void ExitLater_Click(object sender, RoutedEventArgs e)
+    private void NyExitLater_Click(object sender, RoutedEventArgs e)
     {
         GlobalConsts.UpdateOnExit = true;
         GlobalConsts.UpdateControl = this;
         GlobalConsts.UpdateLater = true;
-        GlobalConsts.LoadPage(GlobalConsts.MainPage.Load());
+        GlobalConsts.NyLoadPage(GlobalConsts.MainPage.NyLoad());
     }
 
-    private async Task DownloadCompletedLater(object sender, AsyncCompletedEventArgs e)
+    private async Task NyDownloadCompletedLater(object sender, AsyncCompletedEventArgs e)
 
     {
         await Dispatcher.InvokeAsync(async () =>
@@ -216,13 +205,13 @@ public partial class DownloadUpdate : UserControl, IDownload
             {
                 GlobalConsts.UpdateOnExit = false;
                 GlobalConsts.UpdateSetupLocation = string.Empty;
-                await GlobalConsts.ShowMessage($"{FindResource("UpdateFailed")}", $"{string.Concat(FindResource("CannotUpdate"), e.Error.Message)}");
+                await GlobalConsts.NyShowMessage($"{FindResource("UpdateFailed")}", $"{string.Concat(FindResource("CannotUpdate"), e.Error.Message)}");
             }
             else if (e.Cancelled)
             {
                 GlobalConsts.UpdateOnExit = false;
                 GlobalConsts.UpdateSetupLocation = string.Empty;
-                await GlobalConsts.ShowMessage($"{FindResource("UpdateFailed")}", $"{string.Concat(FindResource("UpdateCancelled"), e.Error?.Message ?? "")}");
+                await GlobalConsts.NyShowMessage($"{FindResource("UpdateFailed")}", $"{string.Concat(FindResource("UpdateCancelled"), e.Error?.Message ?? "")}");
             }
             else
             {
@@ -235,7 +224,7 @@ public partial class DownloadUpdate : UserControl, IDownload
         });
     }
 
-    public DownloadUpdate UpdateLaterStillDownloading()
+    public DownloadUpdate NyUpdateLaterStillDownloading()
     {
         UpdateLaterButton.Visibility = Visibility.Collapsed;
         BackButton.Visibility = Visibility.Visible;
@@ -244,9 +233,19 @@ public partial class DownloadUpdate : UserControl, IDownload
 
         return this;
     }
-    public void OpenFolder_Click(object sender, RoutedEventArgs e) { }
+    public bool IsPaused => false;
+    public string Destination => "";
+    public string Source => "";
+    public IReadOnlyList<QueueFileItem> Files => [];
+    public void Pause() { }
+    public void Resume() { }
+    public void PauseFile(string videoId) { }
+    public void ResumeFile(string videoId) { }
+    public void PrioritizeFile(string videoId) { }
+    public bool RetryFile(string videoId) => false;
+    public void NyOpenFolder_Click(object sender, RoutedEventArgs e) { }
 
-    public void Exit()
+    public void NyExit()
     {
         if (!downloadFinished)
         {
@@ -264,15 +263,15 @@ public partial class DownloadUpdate : UserControl, IDownload
         }
     }
 
-    public Task<bool> Cancel()
+    public Task<bool> NyCancel()
     {
-        Exit();
+        NyExit();
         return Task.FromResult(true);
     }
 
     #region IDisposable Support
     private bool disposedValue = false;
-    protected virtual void Dispose(bool disposing)
+    protected virtual void NyDispose(bool disposing)
     {
         if (!disposedValue)
         {
@@ -287,7 +286,7 @@ public partial class DownloadUpdate : UserControl, IDownload
     }
     public void Dispose()
     {
-        Dispose(true);
+        NyDispose(true);
     }
     #endregion
 }
