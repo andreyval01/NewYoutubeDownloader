@@ -1,21 +1,22 @@
 # NewYoutubeDownloader
 
-A Windows app for downloading videos, playlists and channels from YouTube, Rutube and VK Video.
+Программа для Windows. Скачивает видео, плейлисты и каналы с YouTube, Rutube и VK Video.
 
-## Features
+## Возможности
 
-- YouTube, Rutube and VK Video
-- Playlists in their own folders, numbered files and an `.m3u` playback list
-- Queue, limited simultaneous downloads, resume after restart
-- Optional sign-in for restricted YouTube and Rutube content
-- Convert to common audio and video formats
-- Themes and multiple languages
+- YouTube, Rutube и VK Video
+- Плейлисты в отдельных папках, нумерованные файлы и список воспроизведения `.m3u`
+- Очередь, ограничение одновременных загрузок и продолжение после перезапуска
+- Вход в аккаунт для закрытых роликов YouTube и Rutube
+- Конвертация в обычные аудио- и видеоформаты
+- Перекодирование уже скачанных файлов с оценкой размера
+- Темы оформления и несколько языков
 
-Public videos download without an account. Sign in under Settings when a source requires a session.
+Открытые ролики скачиваются без аккаунта. Если источник требует сессию, войдите в настройках.
 
-Version 0.1.
+Версия 0.1. Готовая сборка: [релиз 0.1](https://github.com/andreyval01/NewYoutubeDownloader/releases/tag/v0.1).
 
-Place `ffmpeg.exe` next to `NewYoutubeDownloader.exe`. The project copies `tools\yt-dlp.exe` beside the program when it builds.
+Положите `ffmpeg.exe` рядом с `NewYoutubeDownloader.exe`. При сборке проект копирует `tools\yt-dlp.exe` рядом с программой.
 
 ```
 dotnet build YoutubePlaylistDownloader\YoutubePlaylistDownloader.csproj -c Release
