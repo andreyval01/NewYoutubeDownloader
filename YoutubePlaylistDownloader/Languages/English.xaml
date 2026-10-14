@@ -295,6 +295,21 @@ Please note that not all the parameters are always available (for example, when 
     <s:String x:Key="TranscodeAudio">Audio</s:String>
     <s:String x:Key="TranscodeBitrate">Bitrate</s:String>
     <s:String x:Key="TranscodeOriginal">Original</s:String>
+    <s:String x:Key="TranscodeCopy">Copy</s:String>
+    <s:String x:Key="TranscodeAudioOnlyOption">Audio only</s:String>
+    <s:String x:Key="TranscodeLossless">Lossless</s:String>
+    <s:String x:Key="TranscodeKbps">{0} kbps</s:String>
+    <s:String x:Key="TranscodeAudioQuality">Audio quality</s:String>
+    <s:String x:Key="TranscodeSlowCodec">VP9 and AV1 take longer to encode than H.264.</s:String>
+    <s:String x:Key="TranscodeDeviceFormat">AVI, MPG and WMV use older codecs for many TVs. MOV, M4V and 3GP suit phones and tablets. MPEG-TS suits many TVs.</s:String>
+    <s:String x:Key="TranscodeUnchanged">Nothing to change</s:String>
+    <s:String x:Key="TranscodeOutputFolder">Save folder</s:String>
+    <s:String x:Key="TranscodeOutputReset">Default folder</s:String>
+    <s:String x:Key="TranscodeOutputDefault">Default: a transcoding subfolder next to each file</s:String>
+    <s:String x:Key="TranscodeAudioBitrate">Audio bitrate</s:String>
+    <s:String x:Key="TranscodeNoneChecked">Check the files to transcode.</s:String>
+    <s:String x:Key="TranscodeProgressTitle">Progress</s:String>
+    <s:String x:Key="TranscodeProgress">{0}% · {1} of {2}</s:String>
     <s:String x:Key="HelpTranscodeTitle">Transcoding</s:String>
-    <s:String x:Key="HelpTranscode">The Transcode tab compresses files that are already downloaded and replaces the original after a successful encode. Pick a preset to see the estimated size and savings. The percent is an estimate, not the exact size after encoding.</s:String>
+    <s:String x:Key="HelpTranscode">The Transcode tab encodes files that are already downloaded. Check the files to encode. Choose a save folder, or leave the default to write each file into a transcoding subfolder next to the original. The original file stays in place. The list shows the current audio bitrate. Choose a video codec, resolution, audio quality and a container for phones, tablets or TVs (MP4, MOV, M4V, 3GP, AVI, MPG, MPEG-TS, WMV), or pick a preset to compare the estimated size. The percent is an estimate, not the exact size after encoding.</s:String>
 </ResourceDictionary> 

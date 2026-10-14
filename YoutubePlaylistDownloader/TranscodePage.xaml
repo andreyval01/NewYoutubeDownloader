@@ -14,32 +14,59 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <WrapPanel Grid.Row="0" Margin="0,0,0,8">
             <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeAddFiles}" Click="AddFiles_Click"/>
             <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeAddFolder}" Click="AddFolder_Click"/>
+            <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeOutputFolder}" Click="OutputFolder_Click"/>
+            <Button x:Name="OutputDefaultButton" Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeOutputReset}" Click="OutputDefault_Click" Visibility="Collapsed"/>
             <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeClear}" Click="Clear_Click"/>
             <CheckBox x:Name="SubfoldersBox" Content="{DynamicResource TranscodeSubfolders}" IsChecked="True" VerticalAlignment="Center" Margin="8,0,0,0"/>
             <CheckBox x:Name="AgainBox" Content="{DynamicResource TranscodeAgain}" VerticalAlignment="Center" Margin="12,0,0,0"/>
         </WrapPanel>
 
-        <TextBlock Grid.Row="1" x:Name="FolderText" Margin="0,0,0,8" Opacity="0.75" TextWrapping="Wrap"/>
+        <StackPanel Grid.Row="1" Margin="0,0,0,8">
+            <TextBlock x:Name="FolderText" Opacity="0.75" TextWrapping="Wrap"/>
+            <TextBlock x:Name="OutputFolderText" Opacity="0.75" TextWrapping="Wrap" Text="{DynamicResource TranscodeOutputDefault}"/>
+        </StackPanel>
 
-        <DataGrid Grid.Row="2" x:Name="FileGrid" AutoGenerateColumns="False" IsReadOnly="True"
+        <DataGrid Grid.Row="2" x:Name="FileGrid" AutoGenerateColumns="False" IsReadOnly="False"
                   CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Extended" SelectionUnit="FullRow"
                   EnableRowVirtualization="True" SelectionChanged="FileGrid_SelectionChanged">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="{DynamicResource FileName}" Binding="{Binding Name, Mode=OneWay}" Width="2*"/>
-                <DataGridTextColumn Header="{DynamicResource DestinationFolder}" Binding="{Binding Folder, Mode=OneWay}" Width="*"/>
-                <DataGridTextColumn Header="{DynamicResource TranscodeDuration}" Binding="{Binding DurationText, Mode=OneWay}" Width="90"/>
-                <DataGridTextColumn Header="{DynamicResource TranscodeResolution}" Binding="{Binding ResolutionText, Mode=OneWay}" Width="100"/>
-                <DataGridTextColumn Header="{DynamicResource TranscodeVideoCodec}" Binding="{Binding VideoCodec, Mode=OneWay}" Width="90"/>
-                <DataGridTextColumn Header="{DynamicResource TranscodeAudioCodec}" Binding="{Binding AudioCodec, Mode=OneWay}" Width="90"/>
-                <DataGridTextColumn Header="{DynamicResource TranscodeSize}" Binding="{Binding SizeText, Mode=OneWay}" Width="90"/>
-                <DataGridTextColumn Header="{DynamicResource TranscodeEstimated}" Binding="{Binding EstimateText, Mode=OneWay}" Width="100"/>
-                <DataGridTextColumn Header="{DynamicResource TranscodePercent}" Binding="{Binding SavingsText, Mode=OneWay}" Width="80"/>
-                <DataGridTextColumn Header="{DynamicResource QueueState}" Binding="{Binding Status, Mode=OneWay}" Width="160"/>
+                <DataGridTemplateColumn Width="40" CanUserSort="False">
+                    <DataGridTemplateColumn.Header>
+                        <CheckBox ToolTip="{DynamicResource SelectAll}" IsChecked="True" Loaded="SelectAll_Loaded" Click="SelectAll_Click" HorizontalAlignment="Center"/>
+                    </DataGridTemplateColumn.Header>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      PreviewMouseLeftButtonDown="FileCheck_PreviewMouseLeftButtonDown"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="{DynamicResource FileName}" Binding="{Binding Name, Mode=OneWay}" Width="2*" IsReadOnly="True"/>
+                <DataGridTemplateColumn Header="{DynamicResource TranscodeProgressTitle}" Width="130" IsReadOnly="True" CanUserSort="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Controls:MetroProgressBar Height="14" Minimum="0" Maximum="100" Margin="2,0"
+                                                       Value="{Binding Progress, Mode=OneWay}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="{DynamicResource DestinationFolder}" Binding="{Binding Folder, Mode=OneWay}" Width="*" IsReadOnly="True"/>
+                <DataGridTextColumn Header="{DynamicResource TranscodeDuration}" Binding="{Binding DurationText, Mode=OneWay}" Width="90" IsReadOnly="True"/>
+                <DataGridTextColumn Header="{DynamicResource TranscodeResolution}" Binding="{Binding ResolutionText, Mode=OneWay}" Width="100" IsReadOnly="True"/>
+                <DataGridTextColumn Header="{DynamicResource TranscodeVideoCodec}" Binding="{Binding VideoCodec, Mode=OneWay}" Width="90" IsReadOnly="True"/>
+                <DataGridTextColumn Header="{DynamicResource TranscodeAudioCodec}" Binding="{Binding AudioCodec, Mode=OneWay}" Width="90" IsReadOnly="True"/>
+                <DataGridTextColumn Header="{DynamicResource TranscodeAudioBitrate}" Binding="{Binding AudioBitrateText, Mode=OneWay}" Width="110" IsReadOnly="True"/>
+                <DataGridTextColumn Header="{DynamicResource TranscodeSize}" Binding="{Binding SizeText, Mode=OneWay}" Width="90" IsReadOnly="True"/>
+                <DataGridTextColumn Header="{DynamicResource TranscodeEstimated}" Binding="{Binding EstimateText, Mode=OneWay}" Width="100" IsReadOnly="True"/>
+                <DataGridTextColumn Header="{DynamicResource TranscodePercent}" Binding="{Binding SavingsText, Mode=OneWay}" Width="80" IsReadOnly="True"/>
+                <DataGridTextColumn Header="{DynamicResource QueueState}" Binding="{Binding Status, Mode=OneWay}" Width="160" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
 
@@ -48,23 +75,27 @@
             <TextBlock Margin="0,4,0,0" Opacity="0.7" Text="{DynamicResource TranscodeEstimateHint}" TextWrapping="Wrap"/>
         </StackPanel>
 
-        <Border Grid.Row="4" x:Name="CustomPanel" Style="{StaticResource CardBorder}" Visibility="Collapsed" Margin="0,0,0,8">
-            <WrapPanel>
-                <TextBlock Text="{DynamicResource TranscodeContainer}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <ComboBox x:Name="ContainerBox" Width="80" Margin="0,0,12,0" SelectionChanged="Custom_Changed"/>
-                <TextBlock Text="{DynamicResource TranscodeCodec}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <ComboBox x:Name="CodecBox" Width="90" Margin="0,0,12,0" SelectionChanged="Custom_Changed"/>
-                <TextBlock Text="{DynamicResource TranscodeHeight}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <ComboBox x:Name="HeightBox" Width="110" Margin="0,0,12,0" SelectionChanged="Custom_Changed"/>
-                <TextBlock Text="{DynamicResource TranscodeQuality}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <Slider x:Name="CrfSlider" Width="120" Minimum="18" Maximum="35" TickFrequency="1" IsSnapToTickEnabled="True" Value="28" ValueChanged="CrfSlider_ValueChanged" VerticalAlignment="Center"/>
-                <TextBlock x:Name="CrfText" Width="28" VerticalAlignment="Center" Margin="6,0,12,0"/>
-                <TextBlock Text="{DynamicResource TranscodeAudio}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <ComboBox x:Name="AudioBox" Width="80" Margin="0,0,12,0" SelectionChanged="Custom_Changed"/>
-                <TextBlock Text="{DynamicResource TranscodeBitrate}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                <Slider x:Name="BitrateSlider" Width="120" Minimum="64" Maximum="192" TickFrequency="16" IsSnapToTickEnabled="True" Value="128" ValueChanged="BitrateSlider_ValueChanged" VerticalAlignment="Center"/>
-                <TextBlock x:Name="BitrateText" Width="54" VerticalAlignment="Center" Margin="6,0,0,0"/>
-            </WrapPanel>
+        <Border Grid.Row="4" x:Name="CustomPanel" Style="{StaticResource CardBorder}" Margin="0,0,0,8">
+            <StackPanel>
+                <WrapPanel>
+                    <TextBlock Text="{DynamicResource TranscodeVideoCodec}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox x:Name="CodecBox" Width="140" Margin="0,0,12,6" DisplayMemberPath="Label" SelectionChanged="Custom_Changed"/>
+                    <TextBlock Text="{DynamicResource TranscodeResolution}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox x:Name="HeightBox" Width="120" Margin="0,0,12,6" DisplayMemberPath="Label" SelectionChanged="Custom_Changed"/>
+                    <TextBlock Text="{DynamicResource TranscodeQuality}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <Slider x:Name="CrfSlider" Width="120" Minimum="18" Maximum="35" TickFrequency="1" IsSnapToTickEnabled="True" Value="28" ValueChanged="CrfSlider_ValueChanged" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="CrfText" Width="28" VerticalAlignment="Center" Margin="6,0,12,6"/>
+                </WrapPanel>
+                <WrapPanel>
+                    <TextBlock Text="{DynamicResource TranscodeAudioCodec}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox x:Name="AudioBox" Width="140" Margin="0,0,12,0" DisplayMemberPath="Label" SelectionChanged="Custom_Changed"/>
+                    <TextBlock Text="{DynamicResource TranscodeAudioQuality}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox x:Name="BitrateBox" Width="120" Margin="0,0,12,0" DisplayMemberPath="Label" SelectionChanged="Custom_Changed"/>
+                    <TextBlock Text="{DynamicResource TranscodeContainer}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <ComboBox x:Name="ContainerBox" Width="90" Margin="0,0,0,0" SelectionChanged="Custom_Changed"/>
+                </WrapPanel>
+                <TextBlock x:Name="CodecHint" Margin="0,6,0,0" Opacity="0.7" Text="{DynamicResource TranscodeSlowCodec}" TextWrapping="Wrap" Visibility="Collapsed"/>
+            </StackPanel>
         </Border>
 
         <DataGrid Grid.Row="5" x:Name="PresetGrid" AutoGenerateColumns="False" IsReadOnly="True"
@@ -81,7 +112,12 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <WrapPanel Grid.Row="6" Margin="0,8,0,0">
+        <StackPanel Grid.Row="6" Margin="0,8,0,0">
+            <Controls:MetroProgressBar x:Name="ProgressBar" Height="18" Minimum="0" Maximum="100"/>
+            <TextBlock x:Name="ProgressText" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+        </StackPanel>
+
+        <WrapPanel Grid.Row="7" Margin="0,8,0,0">
             <Button x:Name="StartButton" Style="{StaticResource ActionButton}" Content="{DynamicResource TranscodeStart}" Click="Start_Click" IsEnabled="False"/>
             <Button x:Name="CancelButton" Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeCancel}" Click="Cancel_Click" IsEnabled="False"/>
         </WrapPanel>

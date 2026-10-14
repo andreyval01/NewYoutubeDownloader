@@ -293,7 +293,22 @@ $playlist: Название плейлиста
     <s:String x:Key="TranscodeQuality">Качество (CRF)</s:String>
     <s:String x:Key="TranscodeAudio">Звук</s:String>
     <s:String x:Key="TranscodeBitrate">Битрейт</s:String>
-    <s:String x:Key="TranscodeOriginal">Как есть</s:String>
+    <s:String x:Key="TranscodeOriginal">Исходное</s:String>
+    <s:String x:Key="TranscodeCopy">Копировать</s:String>
+    <s:String x:Key="TranscodeAudioOnlyOption">Только звук</s:String>
+    <s:String x:Key="TranscodeLossless">Без потерь</s:String>
+    <s:String x:Key="TranscodeKbps">{0} кбит/с</s:String>
+    <s:String x:Key="TranscodeAudioQuality">Качество звука</s:String>
+    <s:String x:Key="TranscodeSlowCodec">VP9 и AV1 кодируются дольше, чем H.264.</s:String>
+    <s:String x:Key="TranscodeDeviceFormat">AVI, MPG и WMV — старые кодеки для многих телевизоров. MOV, M4V и 3GP подходят для телефонов и планшетов. MPEG-TS подходит для многих телевизоров.</s:String>
+    <s:String x:Key="TranscodeUnchanged">Менять нечего</s:String>
+    <s:String x:Key="TranscodeOutputFolder">Папка сохранения</s:String>
+    <s:String x:Key="TranscodeOutputReset">По умолчанию</s:String>
+    <s:String x:Key="TranscodeOutputDefault">По умолчанию: подпапка transcoding рядом с файлом</s:String>
+    <s:String x:Key="TranscodeAudioBitrate">Битрейт звука</s:String>
+    <s:String x:Key="TranscodeNoneChecked">Отметьте файлы для перекодирования.</s:String>
+    <s:String x:Key="TranscodeProgressTitle">Прогресс</s:String>
+    <s:String x:Key="TranscodeProgress">{0}% · {1} из {2}</s:String>
     <s:String x:Key="HelpTranscodeTitle">Перекодирование</s:String>
-    <s:String x:Key="HelpTranscode">Раздел «Перекодирование» сжимает уже скачанные файлы и заменяет исходный файл после успешного кодирования. Выберите вариант, чтобы увидеть оценку размера и экономии. Процент — это оценка, а не точный размер после кодирования.</s:String>
+    <s:String x:Key="HelpTranscode">Раздел «Перекодирование» кодирует уже скачанные файлы. Отметьте файлы, которые нужно перекодировать. Выберите папку сохранения или оставьте значение по умолчанию: каждый файл записывается в подпапку transcoding рядом с исходным. Исходный файл остаётся на месте. В списке виден текущий битрейт звука. Выберите кодек видео, разрешение, качество звука и контейнер для телефона, планшета или телевизора (MP4, MOV, M4V, 3GP, AVI, MPG, MPEG-TS, WMV) или готовый вариант, чтобы сравнить оценку размера. Процент — это оценка, а не точный размер после кодирования.</s:String>
 </ResourceDictionary>

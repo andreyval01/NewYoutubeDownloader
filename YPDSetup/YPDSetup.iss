@@ -7,8 +7,8 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{7C4E1A2B-9D63-4F18-A6E5-2B8C0D4E91F7}
 AppName=NewYoutubeDownloader
-AppVersion=0.1
-AppVerName=NewYoutubeDownloader 0.1
+AppVersion=0.2
+AppVerName=NewYoutubeDownloader 0.2
 AppPublisher=NewYoutubeDownloader
 AppPublisherURL=
 AppSupportURL=
@@ -16,7 +16,7 @@ AppUpdatesURL=
 DefaultDirName={commonpf}\NewYoutubeDownloader
 DefaultGroupName=NewYoutubeDownloader
 AllowNoIcons=yes
-OutputDir=D:\Inno output\0.1
+OutputDir=D:\Inno output\0.2
 OutputBaseFilename=NewYoutubeDownloader
 SetupIconFile=..\YoutubePlaylistDownloader\finalIcon.ico
 Compression=lzma

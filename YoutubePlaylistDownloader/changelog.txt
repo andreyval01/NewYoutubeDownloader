@@ -1,4 +1,12 @@
-﻿0.1:
+﻿0.2:
+- Version number is 0.2
+- Transcode: choose a video codec (copy, H.264, HEVC, VP9, AV1 or audio only), a resolution, and audio codec with quality
+- Transcode: MP4, MOV, M4V, 3GP, AVI, MPG, MPEG-TS and WMV for phones, tablets and TVs
+- Transcode: check the files to encode, and choose a save folder. Without a folder, each file goes into a transcoding subfolder and the original stays
+- Transcode list shows the current audio bitrate
+- Transcode shows a progress line and a progress bar for each file
+
+0.1:
 - First public release: YouTube, Rutube and VK Video downloads, queue, and transcoding of files already downloaded
 
 1.9.47:

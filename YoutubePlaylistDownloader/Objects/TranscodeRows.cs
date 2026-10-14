@@ -2,10 +2,13 @@ namespace YoutubePlaylistDownloader.Objects;
 
 sealed class TranscodeFileRow : INotifyPropertyChanged
 {
+    bool selected = true;
+    int progress;
     string durationText = "";
     string resolutionText = "";
     string videoCodec = "";
     string audioCodec = "";
+    string audioBitrateText = "";
     string sizeText = "";
     string estimateText = "";
     string savingsText = "";
@@ -29,10 +32,36 @@ sealed class TranscodeFileRow : INotifyPropertyChanged
     public string Name => System.IO.Path.GetFileName(Path);
     public string Folder => System.IO.Path.GetDirectoryName(Path) ?? "";
 
+    public bool Selected
+    {
+        get => selected;
+        set
+        {
+            if (selected == value)
+                return;
+            selected = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Selected)));
+        }
+    }
+
+    public int Progress
+    {
+        get => progress;
+        set
+        {
+            var next = Math.Clamp(value, 0, 100);
+            if (progress == next)
+                return;
+            progress = next;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progress)));
+        }
+    }
+
     public string DurationText { get => durationText; set => Set(ref durationText, value, nameof(DurationText)); }
     public string ResolutionText { get => resolutionText; set => Set(ref resolutionText, value, nameof(ResolutionText)); }
     public string VideoCodec { get => videoCodec; set => Set(ref videoCodec, value, nameof(VideoCodec)); }
     public string AudioCodec { get => audioCodec; set => Set(ref audioCodec, value, nameof(AudioCodec)); }
+    public string AudioBitrateText { get => audioBitrateText; set => Set(ref audioBitrateText, value, nameof(AudioBitrateText)); }
     public string SizeText { get => sizeText; set => Set(ref sizeText, value, nameof(SizeText)); }
     public string EstimateText { get => estimateText; set => Set(ref estimateText, value, nameof(EstimateText)); }
     public string SavingsText { get => savingsText; set => Set(ref savingsText, value, nameof(SavingsText)); }
