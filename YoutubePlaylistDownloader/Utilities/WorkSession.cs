@@ -91,6 +91,9 @@ internal static class WorkSession
         {
             Settled = true;
             TranscodePage.Instance?.AllowProbe();
+            Application.Current?.Dispatcher.BeginInvoke(
+                () => GlobalConsts.MainPage?.PlaceQueueOnActiveJob(),
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
     }
 

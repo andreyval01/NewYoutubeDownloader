@@ -126,7 +126,16 @@ public partial class TranscodePage
         }
     }
 
-    async void Start_Click(object sender, RoutedEventArgs e) => await StartNewBatchAsync();
+    async void Start_Click(object sender, RoutedEventArgs e)
+    {
+        if (!runningJob && ViewedJob() is { } job && CanRestart(job))
+        {
+            await PauseOrContinueAsync();
+            return;
+        }
+
+        await StartNewBatchAsync();
+    }
 
     async void Pause_Click(object sender, RoutedEventArgs e) => await PauseOrContinueAsync();
 
@@ -211,7 +220,10 @@ public partial class TranscodePage
         }
 
         var job = ViewedJob();
-        if (job == null || !TranscodeJobStore.CanResume(job))
+        if (job == null || !CanRestart(job))
+            return;
+        ReopenCancelled(job);
+        if (!TranscodeJobStore.CanResume(job))
             return;
         var missing = (string)FindResource("TranscodeSourceMissing");
         TranscodeJobStore.Reconcile(job, missing);
@@ -229,6 +241,37 @@ public partial class TranscodePage
     }
 
     bool forceRun;
+
+    static bool CanRestart(TranscodeJob job)
+    {
+        if (job == null || job.State == "completed")
+            return false;
+        if (TranscodeJobStore.CanResume(job))
+            return true;
+        return job.State == "cancelled"
+               && job.Files?.Any(file => file != null && file.State == "cancelled") == true;
+    }
+
+    static void ReopenCancelled(TranscodeJob job)
+    {
+        if (job?.Files == null || job.State != "cancelled")
+            return;
+        var reopened = false;
+        foreach (var file in job.Files)
+        {
+            if (file == null || file.State != "cancelled")
+                continue;
+            file.State = "pending";
+            file.Error = "";
+            file.Progress = 0;
+            reopened = true;
+        }
+
+        if (!reopened)
+            return;
+        job.State = "paused";
+        job.UserPaused = false;
+    }
 
     void PauseBatch(bool byUser)
     {
@@ -253,6 +296,7 @@ public partial class TranscodePage
         foreach (var process in snapshot)
             TryKill(process);
         ApplyJobStatuses(liveJob);
+        PauseBatchClock();
         UpdateStartButton();
         WorkSession.Refresh();
     }
@@ -267,6 +311,7 @@ public partial class TranscodePage
         }
 
         batchPaused = false;
+        ResumeBatchClock();
         var gate = resumeGate;
         resumeGate = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         gate.TrySetResult(true);
@@ -320,15 +365,14 @@ public partial class TranscodePage
         RememberJob(job, force: true);
         var runnable = job.Files.Where(file => file.State is "pending" or "paused" or "failed" or "working").ToList();
         BeginProgress(Math.Max(1, runnable.Count));
+        BeginBatchTiming(runnable);
         UpdateStartButton();
         WorkSession.Refresh();
         runCts = new CancellationTokenSource();
         var token = runCts.Token;
-        var limit = DownloadSettings.NormalizeSimultaneousDownloads(GlobalConsts.DownloadSettings?.MaxSimultaneousDownloads ?? 2);
-        using var gate = new SemaphoreSlim(limit);
         try
         {
-            var tasks = runnable.Select(file => EncodeFileAsync(file, preset, gate, token));
+            var tasks = runnable.Select(file => EncodeFileAsync(file, preset, token));
             await Task.WhenAll(tasks).ConfigureAwait(true);
         }
         catch (OperationCanceledException)
@@ -364,6 +408,7 @@ public partial class TranscodePage
             runningJob = false;
             batchPaused = false;
             heldForExit = false;
+            FinishBatchClock();
             ApplyJobStatuses(job);
             UpdateStartButton();
             RefreshEstimates();
@@ -372,15 +417,25 @@ public partial class TranscodePage
         }
     }
 
-    async Task EncodeFileAsync(TranscodeJobFile file, TranscodePreset preset, SemaphoreSlim gate, CancellationToken token)
+    async Task EncodeFileAsync(TranscodeJobFile file, TranscodePreset preset, CancellationToken token)
     {
         var row = files.FirstOrDefault(item => string.Equals(item.Path, file.Source, StringComparison.OrdinalIgnoreCase));
+        Task frontWait = null;
         while (!token.IsCancellationRequested)
         {
-            await WaitUntilResumed(token).ConfigureAwait(false);
-            if (token.IsCancellationRequested || file.State is "skipped" or "done" or "cancelled")
-                return;
-            await gate.WaitAsync(token).ConfigureAwait(false);
+            if (frontWait != null)
+            {
+                var pending = frontWait;
+                frontWait = null;
+                await pending.ConfigureAwait(false);
+            }
+            else
+            {
+                await WaitUntilResumed(token).ConfigureAwait(false);
+                if (token.IsCancellationRequested || file.State is "skipped" or "done" or "cancelled")
+                    return;
+                await EncodeGate.WaitAsync(token).ConfigureAwait(false);
+            }
             Process process = null;
             var temp = "";
             var release = true;
@@ -402,6 +457,7 @@ public partial class TranscodePage
                     file.State = "failed";
                     file.Error = TrimError((string)FindResource("TranscodeSourceMissing"));
                     await SetStatus(row, file.Error, null);
+                    NoteEncodeDropped(row);
                     RememberJob(liveJob, force: true);
                     return;
                 }
@@ -422,17 +478,26 @@ public partial class TranscodePage
                     file.Error = (string)FindResource("TranscodeBusyDownload");
                     file.Progress = 100;
                     await SetStatus(row, file.Error, 100);
+                    NoteEncodeDropped(row);
                     RememberJob(liveJob, force: true);
                     return;
                 }
 
-                if (!forceRun && file.State != "failed" && TranscodePlanner.AlreadyDone(file.Output, file.Signature))
+                var yielded = false;
+                if (!string.IsNullOrWhiteSpace(file.Source))
+                {
+                    lock (runningLock)
+                        yielded = yieldRetry.Remove(file.Source);
+                }
+
+                if (!yielded && !forceRun && file.State != "failed" && TranscodePlanner.AlreadyDone(file.Output, file.Signature))
                 {
                     file.State = "skipped";
                     file.Error = "";
                     file.Progress = 100;
                     file.OutputBytes = LengthOf(file.Output);
                     await SetStatus(row, (string)FindResource("TranscodeSkipped"), 100);
+                    NoteEncodeDropped(row);
                     RememberJob(liveJob, force: true);
                     return;
                 }
@@ -446,6 +511,7 @@ public partial class TranscodePage
                     file.Error = (string)FindResource("TranscodeUnchanged");
                     file.Progress = 100;
                     await SetStatus(row, file.Error, 100);
+                    NoteEncodeDropped(row);
                     RememberJob(liveJob, force: true);
                     return;
                 }
@@ -515,11 +581,19 @@ public partial class TranscodePage
 
                 if (!process.Start())
                     throw new InvalidOperationException("ffmpeg did not start.");
+                NoteEncodeStarted(row);
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
                 if (batchPaused || pauseWave != wave)
                     TryKill(process);
                 await process.WaitForExitAsync(token).ConfigureAwait(false);
+                try { process.WaitForExit(); } catch { }
+                if (await StoppedByTrimAsync(process, file, row).ConfigureAwait(false))
+                {
+                    frontWait = EncodeGate.WaitFrontAsync(token);
+                    continue;
+                }
+
                 if (!token.IsCancellationRequested && pauseWave != wave)
                 {
                     DeleteTemp(file.Output);
@@ -541,22 +615,38 @@ public partial class TranscodePage
                 file.Progress = 100;
                 file.OutputBytes = LengthOf(file.Output);
                 await SetStatus(row, (string)FindResource("TranscodeDone"), 100);
+                NoteEncodeFinished(row);
                 RememberJob(liveJob, force: true);
                 return;
             }
             catch (OperationCanceledException)
             {
+                if (!token.IsCancellationRequested && await StoppedByTrimAsync(process, file, row).ConfigureAwait(false))
+                {
+                    frontWait = EncodeGate.WaitFrontAsync(token);
+                    continue;
+                }
+
                 TryKill(process);
                 file.State = "cancelled";
                 DeleteTemp(file.Output);
                 temp = "";
                 if (row != null)
+                {
                     await SetStatus(row, (string)FindResource("TranscodeCancel"), null);
+                    NoteEncodeDropped(row);
+                }
                 RememberJob(liveJob, force: true);
                 return;
             }
             catch (Exception ex)
             {
+                if (!token.IsCancellationRequested && await StoppedByTrimAsync(process, file, row).ConfigureAwait(false))
+                {
+                    frontWait = EncodeGate.WaitFrontAsync(token);
+                    continue;
+                }
+
                 if (token.IsCancellationRequested)
                 {
                     TryKill(process);
@@ -564,7 +654,10 @@ public partial class TranscodePage
                     DeleteTemp(file.Output);
                     temp = "";
                     if (row != null)
+                    {
                         await SetStatus(row, (string)FindResource("TranscodeCancel"), null);
+                        NoteEncodeDropped(row);
+                    }
                     RememberJob(liveJob, force: true);
                     return;
                 }
@@ -585,7 +678,10 @@ public partial class TranscodePage
                 file.Error = TrimError(ex.Message);
                 file.Progress = row?.Progress ?? file.Progress;
                 if (row != null)
+                {
                     await SetStatus(row, file.Error, null);
+                    NoteEncodeDropped(row);
+                }
                 RememberJob(liveJob, force: true);
                 return;
             }
@@ -594,7 +690,10 @@ public partial class TranscodePage
                 if (process != null)
                 {
                     lock (runningLock)
+                    {
                         running.Remove(process);
+                        trimmedEncodes.Remove(process);
+                    }
                     process.Dispose();
                 }
 
@@ -604,9 +703,96 @@ public partial class TranscodePage
                 }
 
                 if (release)
-                    gate.Release();
+                    EncodeGate.Release();
             }
         }
+    }
+
+    void TrimRunningEncodes()
+    {
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.BeginInvoke(TrimRunningEncodes);
+            return;
+        }
+
+        List<Process> extra;
+        lock (runningLock)
+        {
+            var alive = running.Where(CanTrim).ToList();
+            var overflow = alive.Count - EncodeGate.Limit;
+            if (overflow <= 0)
+                return;
+            extra = alive.Skip(alive.Count - overflow).ToList();
+            foreach (var process in extra)
+                trimmedEncodes.Add(process);
+        }
+
+        foreach (var process in extra)
+            TryKill(process);
+    }
+
+    static bool CanTrim(Process process)
+    {
+        if (!ProcessStarted(process))
+            return false;
+        try
+        {
+            return !process.HasExited;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    static bool ProcessStarted(Process process)
+    {
+        try
+        {
+            return process != null && process.StartTime != default;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    bool TakeTrimmed(Process process)
+    {
+        if (process == null)
+            return false;
+        lock (runningLock)
+            return trimmedEncodes.Remove(process);
+    }
+
+    async Task<bool> StoppedByTrimAsync(Process process, TranscodeJobFile file, TranscodeFileRow row)
+    {
+        if (!TakeTrimmed(process))
+            return false;
+        await RequeueTrimmedAsync(file, row).ConfigureAwait(false);
+        return true;
+    }
+
+    async Task RequeueTrimmedAsync(TranscodeJobFile file, TranscodeFileRow row)
+    {
+        DeleteTemp(file.Output);
+        if (!string.IsNullOrWhiteSpace(file.Source))
+        {
+            lock (runningLock)
+                yieldRetry.Add(file.Source);
+        }
+
+        file.State = "pending";
+        file.Error = "";
+        file.Progress = 0;
+        if (row != null)
+        {
+            await SetStatus(row, (string)FindResource("FileQueued"), 0);
+            NoteEncodeReset(row);
+        }
+
+        RememberJob(liveJob, force: true);
     }
 
     async Task WaitUntilResumed(CancellationToken token)
@@ -631,8 +817,12 @@ public partial class TranscodePage
     {
         if (string.IsNullOrWhiteSpace(line) || row?.Facts == null)
             return;
-        if (!TryProgressPercent(line.Trim(), row.Facts.Duration, out var percent))
+        if (!TryMediaSeconds(line.Trim(), out var seconds))
             return;
+        if (file.State is not ("working" or "pending"))
+            return;
+        var duration = row.Facts.Duration.TotalSeconds;
+        var percent = duration < 1 ? 0 : (int)Math.Clamp(seconds * 100 / duration, 0, 99);
         file.Progress = percent;
         if (file.State == "pending")
             file.State = "working";
@@ -640,6 +830,9 @@ public partial class TranscodePage
 
         _ = Dispatcher.InvokeAsync(() =>
         {
+            if (batchPaused || file.State is not ("working" or "pending"))
+                return;
+            row.EncodedSeconds = Math.Max(0, seconds);
             row.Status = percent + "%";
             row.Progress = percent;
             NoteFileProgress(row, percent, row.Name);
@@ -770,12 +963,39 @@ public partial class TranscodePage
         }
 
         ShowSnapshot(job.Preset);
+        PositionOnActiveFile(job);
         if (!string.IsNullOrWhiteSpace(job.OutputDirectory))
         {
             outputDirectory = job.OutputDirectory;
             OutputFolderText.Text = outputDirectory;
             OutputDefaultButton.Visibility = Visibility.Visible;
         }
+    }
+
+    void PositionOnActiveFile(TranscodeJob job)
+    {
+        if (listPositioned || !IsVisible || FileGrid == null)
+            return;
+        var active = job?.Files?.FirstOrDefault(file => file?.State == "working")
+                     ?? job?.Files?.FirstOrDefault(file => file?.State is "pending" or "paused" or "failed");
+        var row = active == null
+            ? null
+            : files.FirstOrDefault(item => string.Equals(item.Path, active.Source, StringComparison.OrdinalIgnoreCase));
+        if (row == null)
+            return;
+        listPositioned = true;
+        var target = row;
+        Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, () =>
+        {
+            if (!files.Contains(target))
+            {
+                listPositioned = false;
+                return;
+            }
+
+            FileGrid.ScrollIntoView(target);
+            FileGrid.SelectedItem = target;
+        });
     }
 
     void ApplyJobStatuses(TranscodeJob job)
@@ -1099,6 +1319,7 @@ public partial class TranscodePage
             return;
         BindJobRows(job);
         UpdateJobButtons();
+        UpdateStartButton();
         if (allowProbe)
             _ = ProbeVisibleAsync();
         else

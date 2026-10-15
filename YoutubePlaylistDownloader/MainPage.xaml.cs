@@ -34,6 +34,8 @@ public partial class MainPage : UserControl
     private List<RelatedPlaylistItem> catalogPlaylists;
     private ICollectionView queueView;
     private QueuedDownload filesOwner;
+    private bool queueAnchored;
+    private bool queueFileAnchored;
     private readonly DispatcherTimer queueStatusTimer = new() { Interval = TimeSpan.FromSeconds(1) };
 
     public MainPage()
@@ -337,6 +339,64 @@ public partial class MainPage : UserControl
     public void NyChangeToQueueTab()
     {
         MetroAnimatedTabControl.SelectedItem = QueueMetroTabItem;
+    }
+
+    public void PlaceQueueOnActiveJob()
+    {
+        if (queueAnchored || QueueGrid == null)
+            return;
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.BeginInvoke(PlaceQueueOnActiveJob);
+            return;
+        }
+
+        QueuedDownload job = null;
+        foreach (var item in GlobalConsts.Downloads)
+        {
+            if (item?.Item is DownloadPage page && page.StillDownloading && !page.IsPaused)
+            {
+                job = item;
+                break;
+            }
+        }
+
+        if (job == null)
+            return;
+        queueAnchored = true;
+        var target = job;
+        Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, () =>
+        {
+            if (!GlobalConsts.Downloads.Contains(target))
+            {
+                queueAnchored = false;
+                PlaceQueueOnActiveJob();
+                return;
+            }
+
+            QueueGrid.SelectedItem = target;
+            QueueGrid.ScrollIntoView(target);
+            PlaceQueueFileOnce();
+        });
+    }
+
+    public void PlaceQueueFileOnce()
+    {
+        if (queueFileAnchored || QueueFilesList == null)
+            return;
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.BeginInvoke(PlaceQueueFileOnce);
+            return;
+        }
+
+        var downloading = FindResource("FileDownloading") as string;
+        var file = filesOwner?.Files?.FirstOrDefault(item => item != null && item.Status == downloading);
+        if (file == null)
+            return;
+        queueFileAnchored = true;
+        QueueFilesList.ScrollIntoView(file);
+        QueueFilesList.SelectedItem = file;
     }
 
     public void ChangeToBulkTab()

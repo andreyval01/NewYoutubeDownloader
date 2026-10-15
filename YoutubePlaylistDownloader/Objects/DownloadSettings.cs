@@ -88,6 +88,10 @@ public class DownloadSettings
     [DefaultValue(2)]
     public int MaxSimultaneousDownloads { get; set; } = 2;
 
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+    [DefaultValue(2)]
+    public int MaxSimultaneousEncodes { get; set; } = 2;
+
     public static int NormalizeSimultaneousDownloads(int value)
         => value < 1 ? 2 : Math.Clamp(value, 1, 16);
 
@@ -96,7 +100,7 @@ public class DownloadSettings
     bool preferQuality, bool convert, bool setBitrate, string bitrate, bool downloadCaptions, string captionsLanguage,
     bool savePlaylistsInDifferentDirectories, bool subset, int subsetStartIndex, int subsetEndIndex, bool openDestinationFolderWhenDone,
     bool tagAudioFile, bool filterVideosByLength, bool filterMode, double filterByLengthValue, string filenamePattern, bool skipExisting,
-    string videoSaveFormat, string videoLanguage, int maxSimultaneousDownloads = 2)
+    string videoSaveFormat, string videoLanguage, int maxSimultaneousDownloads = 2, int maxSimultaneousEncodes = -1)
     {
         SaveFormat = saveFormat;
         AudioOnly = audioOnly;
@@ -122,6 +126,9 @@ public class DownloadSettings
         VideoSaveFormat = videoSaveFormat;
         VideoLanguage = videoLanguage;
         MaxSimultaneousDownloads = NormalizeSimultaneousDownloads(maxSimultaneousDownloads);
+        MaxSimultaneousEncodes = maxSimultaneousEncodes < 1
+            ? MaxSimultaneousDownloads
+            : NormalizeSimultaneousDownloads(maxSimultaneousEncodes);
     }
 
     public DownloadSettings(DownloadSettings settings)
@@ -150,6 +157,7 @@ public class DownloadSettings
         VideoSaveFormat = settings.VideoSaveFormat;
         VideoLanguage = settings.VideoLanguage;
         MaxSimultaneousDownloads = NormalizeSimultaneousDownloads(settings.MaxSimultaneousDownloads);
+        MaxSimultaneousEncodes = NormalizeSimultaneousDownloads(settings.MaxSimultaneousEncodes);
     }
 
     public string NyGetFilenameByPattern(IVideo video, int index, string file, FullPlaylist playlist = null, int totalCount = 0)

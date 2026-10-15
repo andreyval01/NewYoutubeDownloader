@@ -32,6 +32,10 @@
                             <TextBox x:Name="ActualConversionTextBox" Width="48" Margin="12,0,8,0" TextAlignment="Center" VerticalAlignment="Center"/>
                             <TextBlock Text="{DynamicResource ValueChangeRequiresRestart}" VerticalAlignment="Center" TextWrapping="Wrap" Opacity="0.7"/>
                         </WrapPanel>
+                        <WrapPanel Margin="0,6">
+                            <TextBlock Text="{DynamicResource SimultaneousEncodes}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBox x:Name="EncodeLimitBox" Width="48" TextAlignment="Center" VerticalAlignment="Center"/>
+                        </WrapPanel>
                     </StackPanel>
                 </Border>
 

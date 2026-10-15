@@ -59,6 +59,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTextColumn Header="{DynamicResource TranscodeEncodeTime}" Binding="{Binding EncodeTimeText, Mode=OneWay}" Width="150" IsReadOnly="True"/>
                 <DataGridTextColumn Header="{DynamicResource DestinationFolder}" Binding="{Binding Folder, Mode=OneWay}" Width="*" IsReadOnly="True"/>
                 <DataGridTextColumn Header="{DynamicResource TranscodeDuration}" Binding="{Binding DurationText, Mode=OneWay}" Width="90" IsReadOnly="True"/>
                 <DataGridTextColumn Header="{DynamicResource TranscodeResolution}" Binding="{Binding ResolutionText, Mode=OneWay}" Width="100" IsReadOnly="True"/>
@@ -129,9 +130,12 @@
         <StackPanel Grid.Row="8" Margin="0,8,0,0">
             <Controls:MetroProgressBar x:Name="ProgressBar" Height="18" Minimum="0" Maximum="100"/>
             <TextBlock x:Name="ProgressText" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+            <TextBlock x:Name="BatchTimeText" Margin="0,2,0,0" TextWrapping="Wrap"/>
         </StackPanel>
 
         <WrapPanel Grid.Row="9" Margin="0,8,0,0">
+            <TextBlock Text="{DynamicResource SimultaneousEncodes}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <TextBox x:Name="EncodeLimitBox" Width="48" MinWidth="48" Margin="0,0,16,0" TextAlignment="Center" VerticalAlignment="Center" TextChanged="EncodeLimitBox_TextChanged"/>
             <Button x:Name="StartButton" Style="{StaticResource ActionButton}" Content="{DynamicResource TranscodeStart}" Click="Start_Click" IsEnabled="False"/>
             <Button x:Name="PauseButton" Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodePause}" Click="Pause_Click" IsEnabled="False"/>
             <Button x:Name="CancelButton" Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeCancel}" Click="Cancel_Click" IsEnabled="False"/>

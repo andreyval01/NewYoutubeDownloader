@@ -12,7 +12,7 @@ static class GlobalConsts
     public static readonly string FFmpegFilePath;
     private static readonly string ConfigFilePath;
     private static readonly string ErrorFilePath;
-    public static readonly Version VERSION = new(0, 3);
+    public static readonly Version VERSION = new(0, 5);
     public static bool UpdateOnExit;
     public static string UpdateSetupLocation;
     public static bool UpdateFinishedDownloading;
@@ -42,6 +42,7 @@ static class GlobalConsts
             {
                 downloadSettings = value;
                 DownloadGate.Limit = DownloadSettings.NormalizeSimultaneousDownloads(downloadSettings.MaxSimultaneousDownloads);
+                EncodeGate.Limit = DownloadSettings.NormalizeSimultaneousDownloads(downloadSettings.MaxSimultaneousEncodes);
                 File.WriteAllText(DownloadSettingsFilePath, JsonConvert.SerializeObject(downloadSettings));
             }
         }
@@ -585,7 +586,10 @@ static class GlobalConsts
             {
                 downloadSettings = JsonConvert.DeserializeObject<DownloadSettings>(File.ReadAllText(DownloadSettingsFilePath));
                 if (downloadSettings != null)
+                {
                     DownloadGate.Limit = DownloadSettings.NormalizeSimultaneousDownloads(downloadSettings.MaxSimultaneousDownloads);
+                    EncodeGate.Limit = DownloadSettings.NormalizeSimultaneousDownloads(downloadSettings.MaxSimultaneousEncodes);
+                }
             }
             catch (Exception ex)
             {

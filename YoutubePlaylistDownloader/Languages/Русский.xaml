@@ -198,6 +198,7 @@ $playlist: Название плейлиста
     <s:String x:Key="RelatedPlaylistsAdded">Добавлено плейлистов в пакетную загрузку: {0}</s:String>
     <s:String x:Key="ChannelPlaylists">Плейлисты канала</s:String>
     <s:String x:Key="SimultaneousDownloads">Одновременных скачиваний:</s:String>
+    <s:String x:Key="SimultaneousEncodes">Одновременных кодирований:</s:String>
     <s:String x:Key="WaitingInQueue">Ожидание в очереди...</s:String>
     <s:String x:Key="HelpIntroTitle">Начало работы</s:String>
     <s:String x:Key="HelpIntro">Вставьте ссылку на видео, плейлист или канал YouTube, Rutube или VK Видео. Публичные материалы скачиваются без входа. Для закрытых и ограниченных видео войдите в аккаунт в Настройках.</s:String>
@@ -309,6 +310,10 @@ $playlist: Название плейлиста
     <s:String x:Key="TranscodeNoneChecked">Отметьте файлы для перекодирования.</s:String>
     <s:String x:Key="TranscodeProgressTitle">Прогресс</s:String>
     <s:String x:Key="TranscodeProgress">{0}% · {1} из {2}</s:String>
+    <s:String x:Key="TranscodeEncodeTime">Время кодирования</s:String>
+    <s:String x:Key="TranscodeBatchTime">Прошло {0} · осталось {1} · всего около {2} · окончание {3}</s:String>
+    <s:String x:Key="TranscodeBatchTimePaused">Прошло {0} · осталось {1} · всего около {2} · окончание {3} · пауза</s:String>
+    <s:String x:Key="TranscodeTimeCalculating">считаем…</s:String>
     <s:String x:Key="TranscodeAgainHint">Не спрашивать, всегда перекодировать.</s:String>
     <s:String x:Key="TranscodePause">Пауза</s:String>
     <s:String x:Key="TranscodeResume">Продолжить</s:String>
@@ -339,5 +344,5 @@ $playlist: Название плейлиста
     <s:String x:Key="SessionContinue">Продолжить</s:String>
     <s:String x:Key="SessionNotNow">Не сейчас</s:String>
     <s:String x:Key="HelpTranscodeTitle">Перекодирование</s:String>
-    <s:String x:Key="HelpTranscode">Раздел «Перекодирование» кодирует уже скачанные файлы. Отметьте файлы, которые нужно перекодировать. Выберите папку сохранения или оставьте значение по умолчанию: каждый файл записывается в подпапку transcoding рядом с исходным. Исходный файл остаётся на месте. В списке виден текущий битрейт звука. Выберите кодек видео, разрешение, качество звука и контейнер для телефона, планшета или телевизора (MP4, MOV, M4V, 3GP, AVI, MPG, MPEG-TS, WMV) или готовый вариант, чтобы сравнить оценку размера. Процент — это оценка, а не точный размер после кодирования.</s:String>
+    <s:String x:Key="HelpTranscode">Раздел «Перекодирование» кодирует уже скачанные файлы. Отметьте файлы, которые нужно перекодировать. Выберите папку сохранения или оставьте значение по умолчанию: каждый файл записывается в подпапку transcoding рядом с исходным. Исходный файл остаётся на месте. В списке виден текущий битрейт звука. Выберите кодек видео, разрешение, качество звука и контейнер для телефона, планшета или телевизора (MP4, MOV, M4V, 3GP, AVI, MPG, MPEG-TS, WMV) или готовый вариант, чтобы сравнить оценку размера. Процент — это оценка, а не точный размер после кодирования. Во время кодирования у каждого файла видно, сколько оно уже идёт. Для всего списка показываются прошедшее время, ориентировочное оставшееся и общее время и дата окончания. В опциях отдельный предел одновременных кодирований. Если его изменить, лишние процессы останавливаются, а свободные места сразу занимают следующие файлы.</s:String>
 </ResourceDictionary>

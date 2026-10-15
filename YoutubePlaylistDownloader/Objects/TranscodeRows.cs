@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace YoutubePlaylistDownloader.Objects;
 
 sealed class TranscodeFileRow : INotifyPropertyChanged
@@ -13,6 +15,9 @@ sealed class TranscodeFileRow : INotifyPropertyChanged
     string estimateText = "";
     string savingsText = "";
     string status = "";
+    string encodeTimeText = "";
+    Stopwatch encodeClock;
+    bool encodeTicking;
 
     public TranscodeFileRow(string path)
     {
@@ -66,6 +71,90 @@ sealed class TranscodeFileRow : INotifyPropertyChanged
     public string EstimateText { get => estimateText; set => Set(ref estimateText, value, nameof(EstimateText)); }
     public string SavingsText { get => savingsText; set => Set(ref savingsText, value, nameof(SavingsText)); }
     public string Status { get => status; set => Set(ref status, value, nameof(Status)); }
+    public string EncodeTimeText { get => encodeTimeText; set => Set(ref encodeTimeText, value, nameof(EncodeTimeText)); }
+    public double EncodedSeconds { get; set; }
+    public bool CountsForEstimate { get; private set; }
+    public bool EncodeComplete { get; private set; }
+
+    public void PrepareForBatch()
+    {
+        encodeClock = null;
+        encodeTicking = false;
+        EncodedSeconds = 0;
+        CountsForEstimate = true;
+        EncodeComplete = false;
+        EncodeTimeText = "";
+    }
+
+    public void ResetEncodeAttempt()
+    {
+        encodeTicking = false;
+        encodeClock = null;
+        EncodedSeconds = 0;
+        EncodeComplete = false;
+        CountsForEstimate = true;
+        EncodeTimeText = "";
+    }
+
+    public void BeginEncode()
+    {
+        encodeClock = Stopwatch.StartNew();
+        encodeTicking = true;
+        EncodeComplete = false;
+        CountsForEstimate = true;
+        EncodedSeconds = 0;
+        EncodeTimeText = FormatEncodeClock(TimeSpan.Zero);
+    }
+
+    public void PauseEncode()
+    {
+        if (!encodeTicking)
+            return;
+        encodeTicking = false;
+        encodeClock?.Stop();
+        EncodedSeconds = 0;
+        if (encodeClock != null)
+            EncodeTimeText = FormatEncodeClock(encodeClock.Elapsed);
+    }
+
+    public void FinishEncode()
+    {
+        encodeTicking = false;
+        encodeClock?.Stop();
+        EncodeComplete = true;
+        CountsForEstimate = true;
+        var duration = Facts?.Duration.TotalSeconds ?? 0;
+        EncodedSeconds = duration >= 1 ? duration : 1;
+        EncodeTimeText = FormatEncodeClock(encodeClock?.Elapsed ?? TimeSpan.Zero);
+    }
+
+    public void DropEncode()
+    {
+        encodeTicking = false;
+        encodeClock?.Stop();
+        EncodeComplete = false;
+        CountsForEstimate = false;
+        EncodedSeconds = 0;
+        if (encodeClock != null)
+            EncodeTimeText = FormatEncodeClock(encodeClock.Elapsed);
+    }
+
+    public void TickEncode()
+    {
+        if (!encodeTicking || encodeClock == null)
+            return;
+        EncodeTimeText = FormatEncodeClock(encodeClock.Elapsed);
+    }
+
+    public static string FormatEncodeClock(TimeSpan time)
+    {
+        if (time < TimeSpan.Zero)
+            time = TimeSpan.Zero;
+        var hours = (int)time.TotalHours;
+        return hours >= 100
+            ? string.Format(CultureInfo.InvariantCulture, "{0}:{1:00}:{2:00}", hours, time.Minutes, time.Seconds)
+            : string.Format(CultureInfo.InvariantCulture, "{0:00}:{1:00}:{2:00}", hours, time.Minutes, time.Seconds);
+    }
 
     public event PropertyChangedEventHandler PropertyChanged;
 

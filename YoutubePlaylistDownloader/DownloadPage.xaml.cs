@@ -255,6 +255,7 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
             NyStartDownloading(cts.Token).ConfigureAwait(false);
 
         GlobalConsts.Downloads.Add(new QueuedDownload(this));
+        GlobalConsts.MainPage?.PlaceQueueOnActiveJob();
     }
 
     public static async Task NySequenceDownload(
@@ -1359,6 +1360,7 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
 
             currentVideoId = videoId;
             SetFileStatus(videoId, "FileDownloading");
+            GlobalConsts.MainPage?.PlaceQueueFileOnce();
             var video = Videos.ElementAt(index);
             CurrentTitle = video.Title;
             CurrentStatus = (string)FindResource("Downloading");

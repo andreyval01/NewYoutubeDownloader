@@ -65,6 +65,7 @@ public partial class DownloadSettingsControl : UserControl
         FileNamePattenTextBox.Text = settings.FilenamePattern;
         SkipExistingCheckbox.IsChecked = settings.SkipExisting;
         SimultaneousDownloadsTextBox.Text = DownloadSettings.NormalizeSimultaneousDownloads(settings.MaxSimultaneousDownloads).ToString();
+        SimultaneousEncodesTextBox.Text = DownloadSettings.NormalizeSimultaneousDownloads(settings.MaxSimultaneousEncodes).ToString();
         VideoLanguagesComboBox.SelectedItem = VideoLanguages[settings.VideoLanguage ?? "default"];
 
         NySubscribeToEvents();
@@ -107,6 +108,9 @@ public partial class DownloadSettingsControl : UserControl
         SkipExistingCheckbox.Checked += NySkipExistingCheckBox_Checked;
         SkipExistingCheckbox.Unchecked += NySkipExistingCheckBox_Unchecked;
         SimultaneousDownloadsTextBox.TextChanged += SimultaneousDownloadsTextBox_TextChanged;
+        SimultaneousEncodesTextBox.TextChanged += SimultaneousEncodesTextBox_TextChanged;
+        EncodeGate.UiChanged += ShowEncodeLimit;
+        Unloaded += (_, _) => EncodeGate.UiChanged -= ShowEncodeLimit;
         VideoLanguagesComboBox.SelectionChanged += NyVideoLanguagesComboBox_SelectionChanged;
     }
 
@@ -507,6 +511,24 @@ public partial class DownloadSettingsControl : UserControl
         GlobalConsts.DownloadSettings.MaxSimultaneousDownloads = limit;
         DownloadGate.Limit = limit;
         GlobalConsts.NySaveDownloadSettings();
+    }
+
+    private void SimultaneousEncodesTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (suppressEncodeLimit || !int.TryParse(SimultaneousEncodesTextBox.Text, out var value))
+            return;
+        EncodeGate.SetLimit(value, this);
+    }
+
+    bool suppressEncodeLimit;
+
+    void ShowEncodeLimit(int limit, object source)
+    {
+        if (ReferenceEquals(source, this) || SimultaneousEncodesTextBox.Text == limit.ToString())
+            return;
+        suppressEncodeLimit = true;
+        SimultaneousEncodesTextBox.Text = limit.ToString();
+        suppressEncodeLimit = false;
     }
 
 }

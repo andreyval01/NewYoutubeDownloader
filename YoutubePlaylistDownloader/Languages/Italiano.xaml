@@ -195,6 +195,7 @@ Please note that not all the parameters are always available (for example, when 
     <s:String x:Key="RelatedPlaylistsAdded">Added {0} playlist(s) to bulk download</s:String>
     <s:String x:Key="ChannelPlaylists">Channel playlists</s:String>
     <s:String x:Key="SimultaneousDownloads">Simultaneous downloads:</s:String>
+    <s:String x:Key="SimultaneousEncodes">Simultaneous encodes:</s:String>
     <s:String x:Key="WaitingInQueue">Waiting in queue...</s:String>
     <s:String x:Key="HelpIntroTitle">Getting started</s:String>
     <s:String x:Key="HelpIntro">Paste a YouTube, Rutube or VK Video link to a video, playlist or channel. Public content downloads without signing in. For private or restricted videos, sign in under Settings.</s:String>

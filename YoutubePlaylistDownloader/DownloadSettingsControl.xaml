@@ -34,6 +34,10 @@
                         <Label Content="{DynamicResource SimultaneousDownloads}" Margin="5" />
                         <TextBox x:Name="SimultaneousDownloadsTextBox" Margin="5" MinWidth="40" Width="40" TextAlignment="Center" />
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{DynamicResource SimultaneousEncodes}" Margin="5" />
+                        <TextBox x:Name="SimultaneousEncodesTextBox" Margin="5" MinWidth="40" Width="40" TextAlignment="Center" />
+                    </StackPanel>
                 </StackPanel>
                 <Label Content="{DynamicResource Video}" Foreground="{DynamicResource MahApps.Brushes.Accent}" FontSize="26"/>
                 <WrapPanel Orientation="Vertical" Margin="10,0,0,0">

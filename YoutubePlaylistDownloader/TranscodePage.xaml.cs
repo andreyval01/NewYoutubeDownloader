@@ -16,8 +16,16 @@ public partial class TranscodePage : UserControl
     readonly ObservableCollection<TranscodeFileRow> files = [];
     readonly ObservableCollection<TranscodePresetRow> presets = [];
     readonly List<Process> running = [];
+    readonly HashSet<Process> trimmedEncodes = [];
+    readonly HashSet<string> yieldRetry = new(StringComparer.OrdinalIgnoreCase);
+    bool listPositioned;
     readonly object runningLock = new();
     readonly Dictionary<TranscodeFileRow, int> fileProgress = [];
+    readonly List<TranscodeFileRow> timingRows = [];
+    readonly Stopwatch batchClock = new();
+    DispatcherTimer clockTimer;
+    bool clockTimerHooked;
+    DateTime? batchFinishLocal;
     readonly List<Choice> videoCodecs = [];
     readonly List<Choice> audioCodecs = [];
     readonly List<Choice> heights = [];
@@ -28,6 +36,7 @@ public partial class TranscodePage : UserControl
     System.Windows.Controls.CheckBox selectAllBox;
     string outputDirectory;
     bool suppressCustomEvent = true;
+    bool suppressEncodeLimit;
     bool suppressSelectionEvent;
     bool runningJob;
     int progressTotal;
@@ -36,6 +45,12 @@ public partial class TranscodePage : UserControl
     {
         InitializeComponent();
         Instance = this;
+        EncodeGate.LimitChanged += TrimRunningEncodes;
+        suppressEncodeLimit = true;
+        EncodeLimitBox.Text = DownloadSettings.NormalizeSimultaneousDownloads(GlobalConsts.DownloadSettings.MaxSimultaneousEncodes).ToString();
+        suppressEncodeLimit = false;
+        EncodeGate.UiChanged += ShowEncodeLimit;
+        Unloaded += (_, _) => EncodeGate.UiChanged -= ShowEncodeLimit;
         FileGrid.ItemsSource = files;
         PresetGrid.ItemsSource = presets;
         FolderText.Text = GlobalConsts.settings?.SaveDirectory ?? "";
@@ -70,6 +85,7 @@ public partial class TranscodePage : UserControl
         ReloadPresets();
         ShowEmptyEstimate();
         ShowUnfinishedJobs();
+        IsVisibleChanged += (_, _) => PositionOnActiveFile(liveJob ?? ViewedJob());
     }
 
     void AddFiles_Click(object sender, RoutedEventArgs e)
@@ -191,6 +207,7 @@ public partial class TranscodePage : UserControl
             return;
         EnsureDraft();
         files.Clear();
+        ClearBatchTime();
         ShowEmptyEstimate();
     }
 
@@ -894,8 +911,8 @@ public partial class TranscodePage : UserControl
                     && !preset.KeepOriginal
                     && Scope().Any(file => file.Facts?.ProbeOk == true && preset.AppliesTo(file.Facts) && TranscodePlanner.EstimateBytes(file.Facts, preset) is > 0);
         var viewed = ViewedJob();
-        var canContinue = !runningJob && viewed != null && TranscodeJobStore.CanResume(viewed);
-        StartButton.IsEnabled = ready && viewedJobId == null;
+        var canContinue = !runningJob && viewed != null && CanRestart(viewed);
+        StartButton.IsEnabled = ready && (viewedJobId == null || canContinue);
         PauseButton.IsEnabled = runningJob || canContinue;
         CancelButton.IsEnabled = runningJob;
         PauseButton.Content = (runningJob && batchPaused) || (!runningJob && canContinue)
@@ -920,6 +937,22 @@ public partial class TranscodePage : UserControl
         }
     }
 
+    void EncodeLimitBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (suppressEncodeLimit || !int.TryParse(EncodeLimitBox.Text, out var value))
+            return;
+        EncodeGate.SetLimit(value, this);
+    }
+
+    void ShowEncodeLimit(int limit, object source)
+    {
+        if (ReferenceEquals(source, this) || EncodeLimitBox.Text == limit.ToString())
+            return;
+        suppressEncodeLimit = true;
+        EncodeLimitBox.Text = limit.ToString();
+        suppressEncodeLimit = false;
+    }
+
     void ReportProgress(TranscodeFileRow row, string line)
     {
         if (string.IsNullOrWhiteSpace(line) || row.Facts == null || row.Facts.Duration.TotalSeconds < 1)
@@ -935,28 +968,32 @@ public partial class TranscodePage : UserControl
         });
     }
 
-    static bool TryProgressPercent(string line, TimeSpan duration, out int percent)
+    static bool TryMediaSeconds(string line, out double seconds)
     {
-        percent = 0;
-        if (duration.TotalSeconds < 1)
-            return false;
-        double seconds;
+        seconds = 0;
         if (line.StartsWith("out_time=", StringComparison.Ordinal))
         {
             if (!TryOutTime(line["out_time=".Length..], out var time))
                 return false;
             seconds = time.TotalSeconds;
-        }
-        else if (line.StartsWith("out_time_us=", StringComparison.Ordinal)
-                 && long.TryParse(line["out_time_us=".Length..], NumberStyles.Integer, CultureInfo.InvariantCulture, out var micros))
-        {
-            seconds = micros / 1_000_000d;
-        }
-        else
-        {
-            return false;
+            return true;
         }
 
+        if (line.StartsWith("out_time_us=", StringComparison.Ordinal)
+            && long.TryParse(line["out_time_us=".Length..], NumberStyles.Integer, CultureInfo.InvariantCulture, out var micros))
+        {
+            seconds = micros / 1_000_000d;
+            return true;
+        }
+
+        return false;
+    }
+
+    static bool TryProgressPercent(string line, TimeSpan duration, out int percent)
+    {
+        percent = 0;
+        if (duration.TotalSeconds < 1 || !TryMediaSeconds(line, out var seconds))
+            return false;
         percent = (int)Math.Clamp(seconds * 100 / duration.TotalSeconds, 0, 99);
         return true;
     }
@@ -967,6 +1004,210 @@ public partial class TranscodePage : UserControl
         progressTotal = total;
         ProgressBar.Value = 0;
         ProgressText.Text = string.Format((string)FindResource("TranscodeProgress"), 0, 0, total);
+    }
+
+    void BeginBatchTiming(IEnumerable<TranscodeJobFile> runnable)
+    {
+        timingRows.Clear();
+        foreach (var file in runnable)
+        {
+            var row = files.FirstOrDefault(item => string.Equals(item.Path, file.Source, StringComparison.OrdinalIgnoreCase));
+            if (row == null)
+                continue;
+            row.PrepareForBatch();
+            timingRows.Add(row);
+        }
+
+        batchFinishLocal = null;
+        batchClock.Restart();
+        StartClockTimer();
+        UpdateBatchTimeLine();
+    }
+
+    void PauseBatchClock()
+    {
+        if (batchClock.IsRunning)
+            batchClock.Stop();
+        foreach (var row in timingRows)
+            row.PauseEncode();
+        UpdateBatchTimeLine();
+    }
+
+    void ResumeBatchClock()
+    {
+        if (batchFinishLocal != null)
+            return;
+        if (!batchClock.IsRunning)
+            batchClock.Start();
+        StartClockTimer();
+        UpdateBatchTimeLine();
+    }
+
+    void FinishBatchClock()
+    {
+        if (batchClock.IsRunning)
+            batchClock.Stop();
+        batchFinishLocal ??= DateTime.Now;
+        clockTimer?.Stop();
+        UpdateBatchTimeLine();
+    }
+
+    void ClearBatchTime()
+    {
+        batchClock.Reset();
+        batchFinishLocal = null;
+        timingRows.Clear();
+        clockTimer?.Stop();
+        if (BatchTimeText != null)
+            BatchTimeText.Text = "";
+    }
+
+    void StartClockTimer()
+    {
+        clockTimer ??= new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        if (!clockTimerHooked)
+        {
+            clockTimer.Tick += (_, _) =>
+            {
+                foreach (var row in timingRows)
+                    row.TickEncode();
+                UpdateBatchTimeLine();
+            };
+            clockTimerHooked = true;
+        }
+
+        if (!clockTimer.IsEnabled)
+            clockTimer.Start();
+    }
+
+    void NoteEncodeStarted(TranscodeFileRow row)
+    {
+        if (row == null)
+            return;
+        void Start() => row.BeginEncode();
+        if (Dispatcher.CheckAccess())
+            Start();
+        else
+            Dispatcher.Invoke(Start);
+    }
+
+    void NoteEncodeFinished(TranscodeFileRow row)
+    {
+        if (row == null)
+            return;
+        void Finish()
+        {
+            row.FinishEncode();
+            UpdateBatchTimeLine();
+        }
+
+        if (Dispatcher.CheckAccess())
+            Finish();
+        else
+            Dispatcher.Invoke(Finish);
+    }
+
+    void NoteEncodeReset(TranscodeFileRow row)
+    {
+        if (row == null)
+            return;
+        void Reset() => row.ResetEncodeAttempt();
+        if (Dispatcher.CheckAccess())
+            Reset();
+        else
+            Dispatcher.Invoke(Reset);
+    }
+
+    void NoteEncodeDropped(TranscodeFileRow row)
+    {
+        if (row == null)
+            return;
+        void Drop()
+        {
+            row.DropEncode();
+            UpdateBatchTimeLine();
+        }
+
+        if (Dispatcher.CheckAccess())
+            Drop();
+        else
+            Dispatcher.Invoke(Drop);
+    }
+
+    void UpdateBatchTimeLine()
+    {
+        if (BatchTimeText == null)
+            return;
+        if (!batchClock.IsRunning && batchClock.Elapsed == TimeSpan.Zero && batchFinishLocal == null)
+        {
+            BatchTimeText.Text = "";
+            return;
+        }
+
+        var elapsed = batchClock.Elapsed;
+        double doneMedia = 0;
+        double totalMedia = 0;
+        foreach (var row in timingRows)
+        {
+            if (!row.CountsForEstimate)
+                continue;
+            var duration = row.Facts?.Duration.TotalSeconds ?? 0;
+            var weight = duration >= 1 ? duration : 1;
+            totalMedia += weight;
+            if (row.EncodeComplete)
+                doneMedia += weight;
+            else if (duration >= 1)
+                doneMedia += Math.Clamp(row.EncodedSeconds, 0, duration);
+            else
+                doneMedia += weight * Math.Clamp(row.Progress, 0, 99) / 100d;
+        }
+
+        var elapsedText = TranscodeFileRow.FormatEncodeClock(elapsed);
+        string leftText;
+        string totalText;
+        string finishText;
+        var remainingMedia = Math.Max(0, totalMedia - doneMedia);
+        var known = false;
+        TimeSpan remaining = TimeSpan.Zero;
+        if (batchFinishLocal != null || remainingMedia < 0.5 || totalMedia <= 0)
+        {
+            known = true;
+            remaining = TimeSpan.Zero;
+        }
+        else if (elapsed.TotalSeconds >= 8 && doneMedia >= 1)
+        {
+            var rate = doneMedia / elapsed.TotalSeconds;
+            if (rate > 0)
+            {
+                var seconds = remainingMedia / rate;
+                if (seconds < TimeSpan.FromDays(3650).TotalSeconds)
+                {
+                    known = true;
+                    remaining = TimeSpan.FromSeconds(seconds);
+                }
+            }
+        }
+
+        if (!known)
+        {
+            var calculating = (string)FindResource("TranscodeTimeCalculating");
+            leftText = calculating;
+            totalText = calculating;
+            finishText = calculating;
+        }
+        else
+        {
+            var exact = batchFinishLocal != null || remainingMedia < 0.5 || totalMedia <= 0;
+            leftText = (exact ? "" : "~") + TranscodeFileRow.FormatEncodeClock(remaining);
+            totalText = (exact ? "" : "~") + TranscodeFileRow.FormatEncodeClock(elapsed + remaining);
+            var finish = batchFinishLocal ?? DateTime.Now.Add(remaining);
+            finishText = finish.ToString("g", CultureInfo.CurrentCulture);
+        }
+
+        var format = batchPaused && batchFinishLocal == null
+            ? (string)FindResource("TranscodeBatchTimePaused")
+            : (string)FindResource("TranscodeBatchTime");
+        BatchTimeText.Text = string.Format(CultureInfo.CurrentCulture, format, elapsedText, leftText, totalText, finishText);
     }
 
     void NoteFileProgress(TranscodeFileRow row, int percent, string detail)

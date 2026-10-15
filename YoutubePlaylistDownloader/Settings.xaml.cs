@@ -18,6 +18,10 @@ public partial class Settings : UserControl
         ConfirmOnExitCheckBox.IsChecked = GlobalConsts.settings.ConfirmExit;
         ActualConversionTextBox.Text = GlobalConsts.settings.ActualConversionsLimit.ToString();
         ActualConversionTextBox.TextChanged += NyActualConversionTextBox_TextChanged;
+        EncodeLimitBox.Text = DownloadSettings.NormalizeSimultaneousDownloads(GlobalConsts.DownloadSettings.MaxSimultaneousEncodes).ToString();
+        EncodeLimitBox.TextChanged += EncodeLimitBox_TextChanged;
+        EncodeGate.UiChanged += ShowEncodeLimit;
+        Unloaded += (_, _) => EncodeGate.UiChanged -= ShowEncodeLimit;
 
         NightModeCheckBox.Checked += NyNightModeCheckBox_Checked;
         NightModeCheckBox.Unchecked += NyNightModeCheckBox_Unchecked;
@@ -118,6 +122,24 @@ public partial class Settings : UserControl
         {
             ActualConversionTextBox.Background = GlobalConsts.ErrorBrush;
         }
+    }
+
+    bool suppressEncodeLimit;
+
+    private void EncodeLimitBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (suppressEncodeLimit || !int.TryParse(EncodeLimitBox.Text, out var value))
+            return;
+        EncodeGate.SetLimit(value, this);
+    }
+
+    void ShowEncodeLimit(int limit, object source)
+    {
+        if (ReferenceEquals(source, this) || EncodeLimitBox.Text == limit.ToString())
+            return;
+        suppressEncodeLimit = true;
+        EncodeLimitBox.Text = limit.ToString();
+        suppressEncodeLimit = false;
     }
 
     private void NyConfirmOnExitCheckBox_Checked(object sender, RoutedEventArgs e)

@@ -1,4 +1,17 @@
-﻿0.3:
+﻿0.5:
+- Version number is 0.5
+- Transcode has its own simultaneous encode limit, separate from downloads
+- The limit is on the transcode tab and in settings, and it changes the number of ffmpeg processes immediately
+- Lowering the limit stops the extra encodes and puts those files back at the front of the queue
+- A cancelled transcode can be continued
+- On startup the queue and the transcode list open on the active job
+
+0.4:
+- Version number is 0.4
+- Transcode list shows how long each file has been encoding
+- Transcode shows elapsed time, estimated time left, estimated total time and the finish date for the whole batch
+
+0.3:
 - Version number is 0.3
 - Transcode can pause a batch and asks before it overwrites a file that was already converted
 - Transcode presets can be saved, updated and deleted

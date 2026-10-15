@@ -199,6 +199,7 @@ Please note that not all the parameters are always available (for example, when 
     <s:String x:Key="RelatedPlaylistsAdded">Added {0} playlist(s) to bulk download</s:String>
     <s:String x:Key="ChannelPlaylists">Channel playlists</s:String>
     <s:String x:Key="SimultaneousDownloads">Simultaneous downloads:</s:String>
+    <s:String x:Key="SimultaneousEncodes">Simultaneous encodes:</s:String>
     <s:String x:Key="WaitingInQueue">Waiting in queue...</s:String>
     <s:String x:Key="HelpIntroTitle">Getting started</s:String>
     <s:String x:Key="HelpIntro">Paste a YouTube, Rutube or VK Video link to a video, playlist or channel. Public content downloads without signing in. For private or restricted videos, sign in under Settings.</s:String>
@@ -310,6 +311,10 @@ Please note that not all the parameters are always available (for example, when 
     <s:String x:Key="TranscodeNoneChecked">Check the files to transcode.</s:String>
     <s:String x:Key="TranscodeProgressTitle">Progress</s:String>
     <s:String x:Key="TranscodeProgress">{0}% · {1} of {2}</s:String>
+    <s:String x:Key="TranscodeEncodeTime">Encode time</s:String>
+    <s:String x:Key="TranscodeBatchTime">Elapsed {0} · left {1} · about {2} · finishes {3}</s:String>
+    <s:String x:Key="TranscodeBatchTimePaused">Elapsed {0} · left {1} · about {2} · finishes {3} · paused</s:String>
+    <s:String x:Key="TranscodeTimeCalculating">calculating…</s:String>
     <s:String x:Key="TranscodeAgainHint">Do not ask. Always transcode again.</s:String>
     <s:String x:Key="TranscodePause">Pause</s:String>
     <s:String x:Key="TranscodeResume">Resume</s:String>
@@ -340,5 +345,5 @@ Please note that not all the parameters are always available (for example, when 
     <s:String x:Key="SessionContinue">Continue</s:String>
     <s:String x:Key="SessionNotNow">Not now</s:String>
     <s:String x:Key="HelpTranscodeTitle">Transcoding</s:String>
-    <s:String x:Key="HelpTranscode">The Transcode tab encodes files that are already downloaded. Check the files to encode. Choose a save folder, or leave the default to write each file into a transcoding subfolder next to the original. The original file stays in place. The list shows the current audio bitrate. Choose a video codec, resolution, audio quality and a container for phones, tablets or TVs (MP4, MOV, M4V, 3GP, AVI, MPG, MPEG-TS, WMV), or pick a preset to compare the estimated size. The percent is an estimate, not the exact size after encoding.</s:String>
+    <s:String x:Key="HelpTranscode">The Transcode tab encodes files that are already downloaded. Check the files to encode. Choose a save folder, or leave the default to write each file into a transcoding subfolder next to the original. The original file stays in place. The list shows the current audio bitrate. Choose a video codec, resolution, audio quality and a container for phones, tablets or TVs (MP4, MOV, M4V, 3GP, AVI, MPG, MPEG-TS, WMV), or pick a preset to compare the estimated size. The percent is an estimate, not the exact size after encoding. While encoding, each file shows how long it has been encoding. The batch line shows elapsed time, estimated time left, estimated total time and the finish date. Options has a separate simultaneous encode limit. Changing it starts more encodes or stops the extra ones.</s:String>
 </ResourceDictionary> 
