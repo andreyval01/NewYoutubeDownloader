@@ -7,6 +7,7 @@ public partial class Skeleton : MetroWindow
 {
 
     private bool exit = false;
+    private bool closePrompt;
 
     public Skeleton()
     {
@@ -16,7 +17,26 @@ public partial class Skeleton : MetroWindow
         GlobalConsts.Current = this;
         //Go to main menu
         GlobalConsts.NyLoadPage(new MainPage());
-        Dispatcher.BeginInvoke(new Action(() => _ = DownloadPage.ResumePersistedJobsAsync()));
+        Dispatcher.BeginInvoke(new Action(() => _ = WorkSession.OnStartupAsync()), DispatcherPriority.ApplicationIdle);
+    }
+
+    public Task<MessageDialogResult> NyShowThreeButtons(string title, string message, string affirmative, string negative, string auxiliary)
+    {
+        if (string.IsNullOrEmpty(auxiliary))
+        {
+            return this.ShowMessageAsync(title, message, MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings
+            {
+                AffirmativeButtonText = affirmative,
+                NegativeButtonText = negative
+            });
+        }
+
+        return this.ShowMessageAsync(title, message, MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, new MetroDialogSettings
+        {
+            AffirmativeButtonText = affirmative,
+            NegativeButtonText = negative,
+            FirstAuxiliaryButtonText = auxiliary
+        });
     }
 
     public Task<MessageDialogResult> NyCustomYesNoDialog(string title, string message, MetroDialogSettings dialogSettings)
@@ -171,28 +191,41 @@ public partial class Skeleton : MetroWindow
 
     private async void NyMainWindow_Closing(object sender, CancelEventArgs e)
     {
-        if (!exit && GlobalConsts.settings.ConfirmExit)
+        if (exit)
         {
-            e.Cancel = true;
-
-            var exitMessage = $"{FindResource("ExitMessage")}";
-
-            var res = await NyShowYesNoDialog((string)FindResource("Exit"), exitMessage);
-            if (res == MessageDialogResult.Affirmative)
-            {
-
-                exit = true;
-                Close();
-            }
-        }
-        else if (GlobalConsts.UpdateOnExit)
-        {
-            if (GlobalConsts.UpdateLater && !GlobalConsts.UpdateFinishedDownloading)
+            if (GlobalConsts.UpdateOnExit && GlobalConsts.UpdateLater && !GlobalConsts.UpdateFinishedDownloading)
             {
                 e.Cancel = true;
+                exit = false;
                 GlobalConsts.NyLoadPage(GlobalConsts.UpdateControl?.NyUpdateLaterStillDownloading());
-                return;
             }
+
+            return;
+        }
+
+        e.Cancel = true;
+        if (closePrompt)
+            return;
+        closePrompt = true;
+        try
+        {
+            var decision = await WorkSession.ConfirmCloseAsync();
+            if (decision == false)
+                return;
+            if (decision == null && GlobalConsts.settings.ConfirmExit)
+            {
+                var exitMessage = $"{FindResource("ExitMessage")}";
+                var res = await NyShowYesNoDialog((string)FindResource("Exit"), exitMessage);
+                if (res != MessageDialogResult.Affirmative)
+                    return;
+            }
+
+            exit = true;
+            Close();
+        }
+        finally
+        {
+            closePrompt = false;
         }
     }
 

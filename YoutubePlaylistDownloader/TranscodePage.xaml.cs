@@ -35,6 +35,7 @@ public partial class TranscodePage : UserControl
     public TranscodePage()
     {
         InitializeComponent();
+        Instance = this;
         FileGrid.ItemsSource = files;
         PresetGrid.ItemsSource = presets;
         FolderText.Text = GlobalConsts.settings?.SaveDirectory ?? "";
@@ -66,17 +67,16 @@ public partial class TranscodePage : UserControl
         ContainerBox.ItemsSource = VideoContainerList;
         CrfText.Text = ((int)CrfSlider.Value).ToString();
 
-        foreach (var preset in TranscodePlanner.BuiltIn(key => (string)FindResource(key)))
-            presets.Add(new TranscodePresetRow { Preset = preset, Title = preset.Title, Note = preset.Note });
-        if (presets.Count > 1)
-            PresetGrid.SelectedIndex = 1;
-        LoadControls(SelectedPreset());
-        suppressCustomEvent = false;
+        ReloadPresets();
         ShowEmptyEstimate();
+        ShowUnfinishedJobs();
     }
 
     void AddFiles_Click(object sender, RoutedEventArgs e)
     {
+        if (runningJob)
+            return;
+        EnsureDraft();
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
             Multiselect = true,
@@ -88,6 +88,9 @@ public partial class TranscodePage : UserControl
 
     void AddFolder_Click(object sender, RoutedEventArgs e)
     {
+        if (runningJob)
+            return;
+        EnsureDraft();
         using var dialog = new FolderBrowserDialog();
         var current = GlobalConsts.settings?.SaveDirectory;
         if (!string.IsNullOrWhiteSpace(current) && Directory.Exists(current))
@@ -186,6 +189,7 @@ public partial class TranscodePage : UserControl
     {
         if (runningJob)
             return;
+        EnsureDraft();
         files.Clear();
         ShowEmptyEstimate();
     }
@@ -273,6 +277,7 @@ public partial class TranscodePage : UserControl
         }
 
         RefreshEstimates();
+        UpdatePresetButtons();
     }
 
     void Custom_Changed(object sender, SelectionChangedEventArgs e)
@@ -888,55 +893,15 @@ public partial class TranscodePage : UserControl
                     && preset != null
                     && !preset.KeepOriginal
                     && Scope().Any(file => file.Facts?.ProbeOk == true && preset.AppliesTo(file.Facts) && TranscodePlanner.EstimateBytes(file.Facts, preset) is > 0);
-        StartButton.IsEnabled = ready;
+        var viewed = ViewedJob();
+        var canContinue = !runningJob && viewed != null && TranscodeJobStore.CanResume(viewed);
+        StartButton.IsEnabled = ready && viewedJobId == null;
+        PauseButton.IsEnabled = runningJob || canContinue;
         CancelButton.IsEnabled = runningJob;
-    }
-
-    async void Start_Click(object sender, RoutedEventArgs e)
-    {
-        var preset = SelectedPreset();
-        if (preset == null || preset.KeepOriginal || runningJob)
-            return;
-
-        var batch = Scope().Where(file => file.Facts?.ProbeOk == true && preset.AppliesTo(file.Facts)).ToList();
-        if (batch.Count == 0)
-            return;
-
-        var chosenOutput = outputDirectory;
-        var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var jobs = batch.Select(row => (
-            Row: row,
-            Output: UniqueOutput(TranscodePlanner.OutputPath(row.Path, preset, row.Facts, chosenOutput), used)
-        )).ToList();
-
-        runningJob = true;
-        BeginProgress(jobs.Count);
-        UpdateStartButton();
-        runCts = new CancellationTokenSource();
-        var token = runCts.Token;
-        var limit = DownloadSettings.NormalizeSimultaneousDownloads(GlobalConsts.DownloadSettings?.MaxSimultaneousDownloads ?? 2);
-        using var gate = new SemaphoreSlim(limit);
-        var force = AgainBox.IsChecked == true;
-        var busy = (string)FindResource("TranscodeBusyDownload");
-        var skipped = (string)FindResource("TranscodeSkipped");
-        var working = (string)FindResource("TranscodeWorking");
-        var done = (string)FindResource("TranscodeDone");
-        var cancelled = (string)FindResource("TranscodeCancel");
-        var unchanged = (string)FindResource("TranscodeUnchanged");
-        try
-        {
-            var tasks = jobs.Select(job => EncodeAsync(job.Row, preset, job.Output, gate, force, token, busy, skipped, working, done, cancelled, unchanged));
-            await Task.WhenAll(tasks);
-        }
-        catch (OperationCanceledException)
-        {
-        }
-        finally
-        {
-            runningJob = false;
-            UpdateStartButton();
-            RefreshEstimates();
-        }
+        PauseButton.Content = (runningJob && batchPaused) || (!runningJob && canContinue)
+            ? FindResource("TranscodeResume")
+            : FindResource("TranscodePause");
+        UpdateJobButtons();
     }
 
     static string UniqueOutput(string path, HashSet<string> used)
@@ -952,122 +917,6 @@ public partial class TranscodePage : UserControl
             var candidate = Path.GetFullPath(Path.Combine(directory, name + " (" + index + ")" + extension));
             if (used.Add(candidate))
                 return candidate;
-        }
-    }
-
-    async Task EncodeAsync(
-        TranscodeFileRow row,
-        TranscodePreset preset,
-        string finalPath,
-        SemaphoreSlim gate,
-        bool force,
-        CancellationToken token,
-        string busy,
-        string skipped,
-        string working,
-        string done,
-        string cancelled,
-        string unchanged)
-    {
-        await gate.WaitAsync(token).ConfigureAwait(false);
-        Process process = null;
-        var temp = "";
-        try
-        {
-            if (TranscodePlanner.IsStillDownloading(row.Path))
-            {
-                await SetStatus(row, busy, 100);
-                return;
-            }
-
-            var signature = TranscodePlanner.MarkSignature(preset, row.Facts);
-            if (!force && TranscodePlanner.AlreadyDone(finalPath, signature))
-            {
-                await SetStatus(row, skipped, 100);
-                return;
-            }
-
-            if (SameFile(row.Path, finalPath)
-                && TranscodePlanner.IsCopyCodec(preset.VideoCodec)
-                && TranscodePlanner.IsCopyCodec(preset.AudioCodec)
-                && !preset.AudioOnly)
-            {
-                await SetStatus(row, unchanged, 100);
-                return;
-            }
-
-            var directory = Path.GetDirectoryName(finalPath);
-            if (!string.IsNullOrWhiteSpace(directory))
-                Directory.CreateDirectory(directory);
-            temp = finalPath + ".transcode.tmp";
-            if (File.Exists(temp))
-                File.Delete(temp);
-
-            await SetStatus(row, working, 0);
-            var arguments = TranscodePlanner.BuildArguments(row.Facts, preset, temp);
-            process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = GlobalConsts.FFmpegFilePath,
-                    Arguments = arguments,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                },
-                EnableRaisingEvents = true
-            };
-            var errors = new StringBuilder();
-            process.OutputDataReceived += (_, args) => ReportProgress(row, args.Data);
-            process.ErrorDataReceived += (_, args) =>
-            {
-                if (!string.IsNullOrWhiteSpace(args.Data))
-                    errors.AppendLine(args.Data);
-            };
-            lock (runningLock)
-                running.Add(process);
-            if (!process.Start())
-                throw new InvalidOperationException("ffmpeg did not start.");
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-            await process.WaitForExitAsync(token).ConfigureAwait(false);
-            if (process.ExitCode != 0)
-                throw new InvalidOperationException(errors.ToString().Trim());
-
-            TranscodePlanner.Commit(row.Path, temp, finalPath);
-            TranscodePlanner.WriteMark(finalPath, signature);
-            temp = "";
-            await SetStatus(row, done, 100);
-        }
-        catch (OperationCanceledException)
-        {
-            TryKill(process);
-            await SetStatus(row, cancelled, 100);
-        }
-        catch (Exception ex)
-        {
-            TryKill(process);
-            var message = ex.Message.Replace('\r', ' ').Replace('\n', ' ').Trim();
-            if (message.Length > 180)
-                message = message[..180];
-            await SetStatus(row, message, 100);
-        }
-        finally
-        {
-            if (process != null)
-            {
-                lock (runningLock)
-                    running.Remove(process);
-                process.Dispose();
-            }
-
-            if (!string.IsNullOrWhiteSpace(temp) && File.Exists(temp))
-            {
-                try { File.Delete(temp); } catch { }
-            }
-
-            gate.Release();
         }
     }
 
@@ -1180,13 +1029,4 @@ public partial class TranscodePage : UserControl
         }
     }
 
-    void Cancel_Click(object sender, RoutedEventArgs e)
-    {
-        try { runCts?.Cancel(); } catch { }
-        List<Process> snapshot;
-        lock (runningLock)
-            snapshot = running.ToList();
-        foreach (var process in snapshot)
-            TryKill(process);
-    }
 }

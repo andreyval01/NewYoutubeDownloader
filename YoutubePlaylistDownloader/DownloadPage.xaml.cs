@@ -36,6 +36,8 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
     private DispatcherTimer statusTimer;
     private int nextIndex;
     private bool isPaused;
+    private bool exitHeld;
+    private bool pausedBeforeExitHold;
     private bool slotHeld;
     private string currentVideoId;
     private CancellationTokenSource activeVideoCts;
@@ -240,6 +242,7 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
         }
 
         PersistJob(flushNow: true);
+        WorkSession.Refresh();
         GlobalConsts.NySaveDownloadSettings();
         GlobalConsts.NySaveConsts();
         foreach (var row in GlobalConsts.Downloads.Where(item => item.JobId == this.jobId && item.Item is SavedJobPlaceholder).ToList())
@@ -1427,12 +1430,14 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsPaused)));
         try { activeVideoCts?.Cancel(); } catch { }
         PersistJob(true);
+        WorkSession.Refresh();
     }
 
     public void Resume()
     {
         if (!isPaused)
             return;
+        exitHeld = false;
         isPaused = false;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsPaused)));
         var tcs = resumeTcs;
@@ -1441,7 +1446,189 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
         PulseQueue();
         CurrentStatus = (string)FindResource("WaitingInQueue");
         PersistJob(true);
+        WorkSession.Refresh();
     }
+
+    public void BeginExitHold()
+    {
+        if (!StillDownloading || exitHeld)
+            return;
+        pausedBeforeExitHold = isPaused;
+        exitHeld = true;
+        if (!isPaused)
+        {
+            isPaused = true;
+            resumeTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            CurrentStatus = (string)FindResource("Paused");
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsPaused)));
+            try { activeVideoCts?.Cancel(); } catch { }
+            ReleaseSlot();
+        }
+
+        PersistJob(true);
+    }
+
+    public void CancelExitHold()
+    {
+        if (!exitHeld)
+            return;
+        var wasPaused = pausedBeforeExitHold;
+        exitHeld = false;
+        if (!wasPaused)
+            Resume();
+        else
+            PersistJob(true);
+    }
+
+    public void CommitExitPaused()
+    {
+        if (!StillDownloading)
+            return;
+        exitHeld = false;
+        if (!isPaused)
+        {
+            isPaused = true;
+            resumeTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            try { activeVideoCts?.Cancel(); } catch { }
+            ReleaseSlot();
+        }
+
+        CurrentStatus = (string)FindResource("Paused");
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsPaused)));
+        PersistJob(true);
+    }
+
+    public static void BeginExitHoldAll()
+    {
+        foreach (var page in LivePages())
+            page.BeginExitHold();
+    }
+
+    public static void CancelExitHoldAll()
+    {
+        foreach (var page in LivePages())
+            page.CancelExitHold();
+    }
+
+    public static void CommitExitHoldPaused()
+    {
+        foreach (var page in LivePages())
+            page.CommitExitPaused();
+        var snapshot = DownloadQueueStore.GetSnapshot();
+        foreach (var job in snapshot.Jobs ?? [])
+        {
+            if (job == null || job.Paused)
+                continue;
+            job.Paused = true;
+            DownloadQueueStore.UpsertJob(job, false);
+        }
+
+        DownloadQueueStore.NyFlush();
+    }
+
+    public static void ShowSavedQueue(bool markUnpausedAsPaused)
+    {
+        if (markUnpausedAsPaused)
+        {
+            var marking = DownloadQueueStore.GetSnapshot();
+            foreach (var job in marking.Jobs ?? [])
+            {
+                if (job == null || job.Paused)
+                    continue;
+                job.Paused = true;
+                DownloadQueueStore.UpsertJob(job, false);
+            }
+
+            DownloadQueueStore.NyFlush();
+        }
+
+        var jobs = DownloadQueueStore.GetSnapshot().Jobs ?? [];
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            var pausedText = Application.Current.TryFindResource("Paused") as string ?? "Paused";
+            foreach (var job in jobs.OrderBy(item => item.SortOrder))
+            {
+                if (job == null || string.IsNullOrWhiteSpace(job.Url))
+                    continue;
+                var existing = GlobalConsts.Downloads.FirstOrDefault(item => string.Equals(item.JobId, job.Id, StringComparison.OrdinalIgnoreCase));
+                if (existing?.Item is DownloadPage)
+                    continue;
+                if (existing?.Item is SavedJobPlaceholder placeholder)
+                {
+                    if (job.Paused)
+                        placeholder.MarkPaused(pausedText);
+                    continue;
+                }
+
+                GlobalConsts.Downloads.Add(new QueuedDownload(new SavedJobPlaceholder(
+                    job.Id,
+                    job.Title,
+                    job.Paused ? pausedText : job.CurrentStatus,
+                    job.SavePath,
+                    job.Url,
+                    $"({job.DownloadedCount}/{job.TotalCount})",
+                    job.CurrentProgressPercent,
+                    job.Paused)));
+            }
+        });
+    }
+
+    static DownloadPage()
+    {
+        SavedJobPlaceholder.PauseRequested = id => SetSavedPaused(id, true);
+        SavedJobPlaceholder.ResumeRequested = ResumeSavedPlaceholder;
+    }
+
+    public static void EnsureHooks()
+    {
+    }
+
+    static void SetSavedPaused(string id, bool paused)
+    {
+        var job = DownloadQueueStore.GetSnapshot().Jobs?
+            .FirstOrDefault(item => string.Equals(item.Id, id, StringComparison.OrdinalIgnoreCase));
+        if (job == null)
+            return;
+        job.Paused = paused;
+        if (paused)
+            job.CurrentStatus = Application.Current?.TryFindResource("Paused") as string ?? job.CurrentStatus;
+        DownloadQueueStore.UpsertJob(job, true);
+        WorkSession.Refresh();
+    }
+
+    static void ResumeSavedPlaceholder(string id)
+    {
+        if (!WorkSession.Settled)
+            return;
+        if (GlobalConsts.Downloads.Any(item => string.Equals(item.JobId, id, StringComparison.OrdinalIgnoreCase) && item.Item is DownloadPage))
+            return;
+        var job = DownloadQueueStore.GetSnapshot().Jobs?
+            .FirstOrDefault(item => string.Equals(item.Id, id, StringComparison.OrdinalIgnoreCase));
+        if (job == null || string.IsNullOrWhiteSpace(job.Url))
+            return;
+        job.Paused = false;
+        DownloadQueueStore.UpsertJob(job, true);
+        var settings = job.Settings?.NyClone() ?? GlobalConsts.DownloadSettings.NyClone();
+        settings.SkipExisting = true;
+        settings.OpenDestinationFolderWhenDone = false;
+        settings.Subset = false;
+        settings.SubsetStartIndex = 0;
+        settings.SubsetEndIndex = 0;
+        _ = NySequenceDownload(
+            [job.Url],
+            settings,
+            silent: true,
+            savePath: job.SavePath,
+            resume: true,
+            jobId: job.Id,
+            savePathIsFinal: true,
+            enqueuePending: false,
+            startPaused: false,
+            pausedVideoIds: job.PausedVideoIds);
+    }
+
+    static List<DownloadPage> LivePages()
+        => GlobalConsts.Downloads.Select(item => item.Item).OfType<DownloadPage>().ToList();
 
     public void PauseFile(string videoId)
     {
@@ -1628,7 +1815,7 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
             CurrentStatus = CurrentStatus,
             CurrentProgressPercent = CurrentProgressPercent,
             StillDownloading = StillDownloading,
-            Paused = isPaused,
+            Paused = exitHeld ? pausedBeforeExitHold : isPaused,
             SortOrder = QueueIndex(),
             PausedVideoIds = CopyPausedFiles()
         }, flushNow);
@@ -1659,6 +1846,7 @@ public partial class DownloadPage : UserControl, IDisposable, IDownload
             DownloadQueueStore.RemoveJob(jobId);
         if (!string.IsNullOrWhiteSpace(sourceUrl))
             DownloadQueueStore.RemovePending(sourceUrl);
+        WorkSession.Refresh();
     }
 
     private void StartStatusTimer()

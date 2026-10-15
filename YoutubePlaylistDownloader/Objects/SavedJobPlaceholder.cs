@@ -14,6 +14,9 @@ sealed class SavedJobPlaceholder : IDownload
         IsPaused = paused;
     }
 
+    public static Action<string> PauseRequested;
+    public static Action<string> ResumeRequested;
+
     public string JobId { get; }
     public string ImageUrl => "";
     public string Title { get; set; }
@@ -30,16 +33,29 @@ sealed class SavedJobPlaceholder : IDownload
 
     public event PropertyChangedEventHandler PropertyChanged;
 
+    public void MarkPaused(string status)
+    {
+        IsPaused = true;
+        if (!string.IsNullOrWhiteSpace(status))
+            CurrentStatus = status;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsPaused)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentStatus)));
+    }
+
     public void Pause()
     {
         IsPaused = true;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsPaused)));
+        PauseRequested?.Invoke(JobId);
     }
 
     public void Resume()
     {
+        if (!IsPaused)
+            return;
         IsPaused = false;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsPaused)));
+        ResumeRequested?.Invoke(JobId);
     }
 
     public void PauseFile(string videoId) { }

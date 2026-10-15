@@ -1,4 +1,11 @@
-﻿0.2:
+﻿0.3:
+- Version number is 0.3
+- Transcode can pause a batch and asks before it overwrites a file that was already converted
+- Transcode presets can be saved, updated and deleted
+- An unfinished transcode batch is saved and can continue after the program closes or is stopped
+- Closing while a download or a transcode is running asks whether to continue on the next launch
+
+0.2:
 - Version number is 0.2
 - Transcode: choose a video codec (copy, H.264, HEVC, VP9, AV1 or audio only), a resolution, and audio codec with quality
 - Transcode: MP4, MOV, M4V, 3GP, AVI, MPG, MPEG-TS and WMV for phones, tablets and TVs

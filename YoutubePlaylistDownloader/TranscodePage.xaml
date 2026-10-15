@@ -15,6 +15,8 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <WrapPanel Grid.Row="0" Margin="0,0,0,8">
@@ -24,7 +26,7 @@
             <Button x:Name="OutputDefaultButton" Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeOutputReset}" Click="OutputDefault_Click" Visibility="Collapsed"/>
             <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeClear}" Click="Clear_Click"/>
             <CheckBox x:Name="SubfoldersBox" Content="{DynamicResource TranscodeSubfolders}" IsChecked="True" VerticalAlignment="Center" Margin="8,0,0,0"/>
-            <CheckBox x:Name="AgainBox" Content="{DynamicResource TranscodeAgain}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+            <CheckBox x:Name="AgainBox" Content="{DynamicResource TranscodeAgain}" ToolTip="{DynamicResource TranscodeAgainHint}" VerticalAlignment="Center" Margin="12,0,0,0"/>
         </WrapPanel>
 
         <StackPanel Grid.Row="1" Margin="0,0,0,8">
@@ -112,13 +114,26 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <StackPanel Grid.Row="6" Margin="0,8,0,0">
+        <WrapPanel Grid.Row="6" Margin="0,8,0,0">
+            <TextBox x:Name="PresetNameBox" Width="180" MaxLength="80" Margin="0,0,8,0" VerticalAlignment="Center"/>
+            <Button Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeSavePreset}" Click="SavePreset_Click"/>
+            <Button x:Name="UpdatePresetButton" Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeUpdatePreset}" Click="UpdatePreset_Click" IsEnabled="False"/>
+            <Button x:Name="DeletePresetButton" Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeDeletePreset}" Click="DeletePreset_Click" IsEnabled="False"/>
+        </WrapPanel>
+
+        <DockPanel Grid.Row="7" Margin="0,8,0,0">
+            <Button x:Name="DeleteJobButton" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeDeleteJob}" Click="DeleteJob_Click" IsEnabled="False"/>
+            <ComboBox x:Name="JobBox" MinWidth="280" Margin="0,0,8,0" DisplayMemberPath="Title" SelectionChanged="JobBox_SelectionChanged"/>
+        </DockPanel>
+
+        <StackPanel Grid.Row="8" Margin="0,8,0,0">
             <Controls:MetroProgressBar x:Name="ProgressBar" Height="18" Minimum="0" Maximum="100"/>
             <TextBlock x:Name="ProgressText" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
         </StackPanel>
 
-        <WrapPanel Grid.Row="7" Margin="0,8,0,0">
+        <WrapPanel Grid.Row="9" Margin="0,8,0,0">
             <Button x:Name="StartButton" Style="{StaticResource ActionButton}" Content="{DynamicResource TranscodeStart}" Click="Start_Click" IsEnabled="False"/>
+            <Button x:Name="PauseButton" Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodePause}" Click="Pause_Click" IsEnabled="False"/>
             <Button x:Name="CancelButton" Style="{StaticResource SecondaryButton}" Content="{DynamicResource TranscodeCancel}" Click="Cancel_Click" IsEnabled="False"/>
         </WrapPanel>
     </Grid>
