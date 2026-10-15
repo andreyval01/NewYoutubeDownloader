@@ -14,4 +14,11 @@ public partial class Help : UserControl
         GlobalConsts.NyShowSettingsButton();
         GlobalConsts.NyShowAboutButton();
     }
+
+    void OpenGitHub(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+    {
+        if (e.Uri != null)
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        e.Handled = true;
+    }
 }

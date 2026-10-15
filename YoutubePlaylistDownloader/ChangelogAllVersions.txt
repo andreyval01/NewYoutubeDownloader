@@ -1,4 +1,10 @@
-﻿0.5:
+﻿0.6:
+- Version number is 0.6
+- When a transcode batch finishes, a message says the job is done and how long it took
+- Help includes a link to the GitHub repository
+- Help describes the program's functions in full
+
+0.5:
 - Version number is 0.5
 - Transcode has its own simultaneous encode limit, separate from downloads
 - The limit is on the transcode tab and in settings, and it changes the number of ffmpeg processes immediately

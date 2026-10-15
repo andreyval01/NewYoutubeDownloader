@@ -364,6 +364,8 @@ public partial class TranscodePage
         job.State = "running";
         RememberJob(job, force: true);
         var runnable = job.Files.Where(file => file.State is "pending" or "paused" or "failed" or "working").ToList();
+        var announceFinished = false;
+        var finishedElapsed = TimeSpan.Zero;
         BeginProgress(Math.Max(1, runnable.Count));
         BeginBatchTiming(runnable);
         UpdateStartButton();
@@ -408,12 +410,35 @@ public partial class TranscodePage
             runningJob = false;
             batchPaused = false;
             heldForExit = false;
+            announceFinished = job.State == "completed" && runnable.Count > 0;
+            showFinishedMessage = announceFinished;
             FinishBatchClock();
+            finishedElapsed = batchClock.Elapsed;
             ApplyJobStatuses(job);
             UpdateStartButton();
             RefreshEstimates();
             RefreshJobBox(selectId: job.Id);
             WorkSession.Refresh();
+        }
+
+        if (announceFinished)
+            await ShowJobFinished(finishedElapsed).ConfigureAwait(true);
+    }
+
+    async Task ShowJobFinished(TimeSpan elapsed)
+    {
+        try
+        {
+            var window = GlobalConsts.Current;
+            if (window == null || !window.IsLoaded)
+                return;
+            var time = TranscodeFileRow.FormatEncodeClock(elapsed);
+            var message = string.Format(System.Globalization.CultureInfo.CurrentCulture, (string)FindResource("TranscodeJobFinished"), time);
+            await GlobalConsts.NyShowMessage((string)FindResource("Transcode"), message).ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            await GlobalConsts.NyLog(ex.ToString(), "TranscodeFinished").ConfigureAwait(false);
         }
     }
 

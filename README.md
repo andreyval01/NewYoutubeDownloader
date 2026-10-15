@@ -12,15 +12,17 @@
 - Перекодирование уже скачанных файлов: кодек, разрешение, качество, папка сохранения, оценка размера, прогресс и время кодирования
 - Отдельное число одновременных кодирований
 - Пауза перекодирования, свои пресеты и продолжение после закрытия программы
+- Сообщение по окончании перекодирования с затраченным временем
+- Справка по функциям программы и ссылка на исходный код
 - Темы оформления и несколько языков
 
 Открытые ролики скачиваются без аккаунта. Если источник требует сессию, войдите в настройках.
 
-Версия 0.5.
+Версия 0.6.
 
-Сборка для Windows: [NewYoutubeDownloader-0.5-win-x64.zip](https://github.com/andreyval01/NewYoutubeDownloader/releases/download/v0.5/NewYoutubeDownloader-0.5-win-x64.zip)
+Сборка для Windows: [NewYoutubeDownloader-0.6-win-x64.zip](https://github.com/andreyval01/NewYoutubeDownloader/releases/download/v0.6/NewYoutubeDownloader-0.6-win-x64.zip)
 
-Положите `ffmpeg.exe` рядом с `NewYoutubeDownloader.exe`. При сборке проект копирует `tools\yt-dlp.exe` рядом с программой.
+В архиве уже есть `ffmpeg.exe` и `yt-dlp.exe`. При сборке из исходников проект копирует `tools\yt-dlp.exe` рядом с программой; `ffmpeg.exe` нужно положить туда же.
 
 ```
 dotnet build YoutubePlaylistDownloader\YoutubePlaylistDownloader.csproj -c Release

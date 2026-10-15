@@ -12,7 +12,7 @@ static class GlobalConsts
     public static readonly string FFmpegFilePath;
     private static readonly string ConfigFilePath;
     private static readonly string ErrorFilePath;
-    public static readonly Version VERSION = new(0, 5);
+    public static readonly Version VERSION = new(0, 6);
     public static bool UpdateOnExit;
     public static string UpdateSetupLocation;
     public static bool UpdateFinishedDownloading;

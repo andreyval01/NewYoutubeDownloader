@@ -26,6 +26,7 @@ public partial class TranscodePage : UserControl
     DispatcherTimer clockTimer;
     bool clockTimerHooked;
     DateTime? batchFinishLocal;
+    bool showFinishedMessage;
     readonly List<Choice> videoCodecs = [];
     readonly List<Choice> audioCodecs = [];
     readonly List<Choice> heights = [];
@@ -1019,6 +1020,7 @@ public partial class TranscodePage : UserControl
         }
 
         batchFinishLocal = null;
+        showFinishedMessage = false;
         batchClock.Restart();
         StartClockTimer();
         UpdateBatchTimeLine();
@@ -1056,6 +1058,7 @@ public partial class TranscodePage : UserControl
     {
         batchClock.Reset();
         batchFinishLocal = null;
+        showFinishedMessage = false;
         timingRows.Clear();
         clockTimer?.Stop();
         if (BatchTimeText != null)
@@ -1141,6 +1144,15 @@ public partial class TranscodePage : UserControl
         if (!batchClock.IsRunning && batchClock.Elapsed == TimeSpan.Zero && batchFinishLocal == null)
         {
             BatchTimeText.Text = "";
+            return;
+        }
+
+        if (showFinishedMessage && batchFinishLocal != null && !batchClock.IsRunning)
+        {
+            BatchTimeText.Text = string.Format(
+                CultureInfo.CurrentCulture,
+                (string)FindResource("TranscodeJobFinished"),
+                TranscodeFileRow.FormatEncodeClock(batchClock.Elapsed));
             return;
         }
 

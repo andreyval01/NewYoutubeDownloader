@@ -9,7 +9,13 @@
         <StackPanel MaxWidth="820" HorizontalAlignment="Stretch">
             <TextBlock Text="{DynamicResource Help}" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,4"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"/>
-            <TextBlock x:Name="VersionText" FontSize="13" Opacity="0.7" Margin="0,0,0,16"/>
+            <TextBlock x:Name="VersionText" FontSize="13" Opacity="0.7" Margin="0,0,0,4"/>
+            <TextBlock FontSize="14" Margin="0,0,0,16">
+                <Hyperlink x:Name="GitHubLink"
+                           Foreground="{DynamicResource MahApps.Brushes.Accent}"
+                           NavigateUri="https://github.com/andreyval01/NewYoutubeDownloader"
+                           RequestNavigate="OpenGitHub">https://github.com/andreyval01/NewYoutubeDownloader</Hyperlink>
+            </TextBlock>
 
             <Border Style="{StaticResource CardBorder}">
                 <StackPanel>
@@ -21,6 +27,12 @@
                 <StackPanel>
                     <TextBlock Text="{DynamicResource HelpDownloadTitle}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
                     <TextBlock Text="{DynamicResource HelpDownload}" TextWrapping="Wrap" LineHeight="22"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorder}">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource HelpOptionsTitle}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Text="{DynamicResource HelpOptions}" TextWrapping="Wrap" LineHeight="22"/>
                 </StackPanel>
             </Border>
             <Border Style="{StaticResource CardBorder}">
@@ -39,6 +51,12 @@
                 <StackPanel>
                     <TextBlock Text="{DynamicResource HelpQueueTitle}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
                     <TextBlock Text="{DynamicResource HelpQueue}" TextWrapping="Wrap" LineHeight="22"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorder}">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource HelpExitTitle}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Text="{DynamicResource HelpExit}" TextWrapping="Wrap" LineHeight="22"/>
                 </StackPanel>
             </Border>
             <Border Style="{StaticResource CardBorder}">
